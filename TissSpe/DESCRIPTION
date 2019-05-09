@@ -1,0 +1,14 @@
+Package: TissSpe
+Type: Package
+Title: Caculate tissue-specific index
+Version: 0.1.0
+Author@R: person(given = "Zhidan", family = "Li", email = "lzd_hunan@126.com", role = c("aut", "cre"))
+Maintainer: Zhidan Li <lzd_hunan@126.com>
+Description: This package implements method to caculate tissue-specific index 
+    for gene experession, alternative splicing events PSI.
+Imports:
+pheatmap,
+DescTools
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
