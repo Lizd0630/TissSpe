@@ -2,18 +2,22 @@
 % Please edit documentation in R/visualization.R
 \name{plot_density}
 \alias{plot_density}
-\title{Transformed specificity density plot}
+\title{Density plot of transformed specificity}
 \usage{
-plot_density(df, ymax = 12)
+plot_density(lst, ymax = 12)
 }
 \arguments{
-\item{df}{A data.frame contains specificity, which from \code{ts_psi},
+\item{lst}{List of two data.frame. one of them contains psi values with their
+specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+"Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
 \code{ts_expr}.}
 
-\item{ymax}{numeric. maximum in ylim. Default 12.}
+\item{ymax}{Numeric. maximum of y limitation. Default 12.}
 }
 \description{
-Plot density curves of 9 methods.
+Plot density curves of 9 methods. Transformation methods in this function,
+refers to paper, please!
 }
 \examples{
 \dontrun{

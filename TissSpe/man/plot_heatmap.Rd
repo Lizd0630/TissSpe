@@ -2,31 +2,32 @@
 % Please edit documentation in R/visualization.R
 \name{plot_heatmap}
 \alias{plot_heatmap}
-\title{heatmap for subset specificity expression}
+\title{Heatmap for subset specific-expression}
 \usage{
-plot_heatmap(df, dat_type = "raw", specificity = c(0.8, 1),
+plot_heatmap(lst, dat_type = "raw", specificity = c(0.8, 1),
   ts_method = "Tau", Ib = 1, ...)
 }
 \arguments{
-\item{df}{List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.}
+\item{lst}{List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.}
 
-\item{dat_type}{"raw" or "bin". Plot raw data(psi/FPKM/RPKM/TPM) or
-bin(binary index). Default "raw". "raw" work with \code{specificity}, and
+\item{dat_type}{"raw" or "bin". Plot "raw"(psi/FPKM/RPKM/TPM) or
+"bin"(binary index). Default "raw". "raw" work with \code{specificity}, and
 "bin" work with \code{Ib}.}
 
-\item{specificity}{numeric. Cutoff of specificity, work with
-\code{dat_type}="raw". Default 0.8.}
+\item{specificity}{Vector of range, numeric. Region of specificity to plot,
+work with \code{dat_type}="raw". Default \code{c(0.8, 1)}.}
 
-\item{ts_method}{specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
-"Hg", "Zscore", "SPM", "PEM".}
+\item{ts_method}{Specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
+"Hg", "Zscore", "Spm" or "Pem".}
 
-\item{Ib}{integer. Cutoff of binary index, work with \code{dat_type}="bin".}
+\item{Ib}{Integer. Cutoff of binary index, work with \code{dat_type}="bin".}
 
-\item{...}{parameters of pheatmap pkg.}
+\item{...}{parameters of \code{pheatmap} pkg.}
 }
 \description{
-Wrapper function derived from pheatmap. Use the results of \code{ts_expr}
-or \code{ts_psi} as Input.
+Wrapper function derived from \code{pheatmap}. Use the results of
+\code{ts_expr} or \code{ts_psi} as Input. Using pheatmap youself may be
+better for yourwork sometimes.
 }
 \examples{
 result <- ts_psi(tmp_psi,

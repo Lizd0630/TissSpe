@@ -2,61 +2,65 @@
 % Please edit documentation in R/main.R
 \name{ts_expr}
 \alias{ts_expr}
-\title{Calculate specificity for a given gene expression data.frame}
+\title{Calculate specificity for gene expression}
 \usage{
 ts_expr(df, binary = "seq", n = 12, min = 0, max = 16, step = 1,
   trans = "log2_QN", tissues, identifier, na.del = TRUE, cutoff = 1,
   mingap = 2)
 }
 \arguments{
-\item{df}{data.frame, which contain gene expression vaules.}
+\item{df}{data.frame, which contain psi vaules. One column is the names of
+symbols, like gene id, etc.}
 
-\item{binary}{"seq" or "quant". Binary method, "seq" refer to
+\item{binary}{"seq" or "quant". Binary-intervals method, "seq" refer to
 equal-width-intervals and "quant" refer to equal-density-intervals.}
 
-\item{n}{Integer. Cut the gene expression values into (n+2)
-equal-density-intervals. Default 10.}
+\item{n}{Integer. \code{n+2} "seq" or "quant" intervals be generated of all
+expression values. Default 10.}
 
-\item{min}{Numeric. The values under min will be graded into rank 0.
-Defaut 0. Be careful when used with \code{trans}.}
+\item{min}{Numeric. The values under \code{min} will be graded into rank
+0(unexpressed). Be careful when used with \code{trans}. Defaut 0.}
 
-\item{max}{Numeric. The values over max will be graded into rank (n+1).
-Default 16. Be careful when used with \code{trans}.}
+\item{max}{Numeric. The values over \code{max} will be graded into rank
+\code{n+1}(highest). Default 16.}
 
-\item{step}{Numeric. Width of intervals in "seq" method. Be careful when
-used with \code{trans}.}
+\item{step}{Numeric. Width of intervals in \code{binary} "seq" method. Be
+careful when used with \code{trans}.}
 
-\item{trans}{Charactor. "log2", "log2_QN", "QN". "QN" means
+\item{trans}{Charactor. one of "log2", "log2_QN", "QN". "QN" means
 \code{quantile.normolize}.}
 
-\item{tissues}{Vector of charactors, at leat 2. Analysed Tissues' unique
-identifiers, and must keep away from "Tau", "Gini", "Tsi", "Counts", "Ee",
-"Pem", "Hg", "Z", "Spm", "Mean" and "Max".}
+\item{tissues}{Vector of charactors, at leat length of 2. Analysed Tissues'
+unique identifiers, and must exactly keep away from "Tau", "Gini", "Tsi",
+"Counts", "Ee", "Pem", "Hg", "Z", "Spm", "Ib", "Type", "Mean" and "Max".}
 
-\item{identifier}{Charactor. The colname of unique identifiers for row
-symbols, like "gene_id" or "AS_events".}
+\item{identifier}{Charactor. Length of 1. The colname of unique identifiers
+for records, like "gene_id", "AS_events", etc.}
 
-\item{na.del}{Logical. Weather NA will be dropped. Default TRUE.}
+\item{na.del}{Logical. Whether NAs will be dropped. Default TRUE.}
 
-\item{cutoff}{Numeric. Values under cutoff will set to 0(unexpressed) in
-Specificity method Counts.}
+\item{cutoff}{Numeric. Values under \code{cutoff} will set to 0(unexpressed)
+in Specificity method "Counts".}
 
-\item{mingap}{integer. Minimal gap to generate binary pattern. Default 2.}
+\item{mingap}{Integer. Minimal gap of generating binary pattern. Default 2.}
 }
 \value{
-Specificity of gene expression values in \code{df}. A list with 2
-data.frames, which contain raw values and binary pattern values and their
-specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm".
+List of two data.frame. one of them contains expression values with
+their specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee",
+"Pem", "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values
+and index binary "Ib"(named "bin").
 }
 \description{
+Function to find tissue-specific gene expression for a given data.frame.
+}
+\details{
 Function to detect tissue specific gene, and return a list with 2
 data.frames, which contain raw values and binary pattern values and their
-specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm".
-Rows with NA will be dropped. Of the binary pattern, all values betwwen min
-and max in the data.frame will be graded into n equal-width-intervals or n
-equal-density-intervals and assign the rank 0 to (n+1), respectively.
+specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+"Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
+all values betwwen \code{min} and \code{max} in the data.frame will be
+graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
+and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 }
 \examples{
 ts_psi(tmp_tpm,

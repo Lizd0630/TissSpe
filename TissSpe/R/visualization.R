@@ -1,13 +1,17 @@
 ###########################
 # specificty distribution #
 ###########################
-#' Transformed specificity density plot
+#' Density plot of transformed specificity
 #'
-#' Plot density curves of 9 methods.
+#' Plot density curves of 9 methods. Transformation methods in this function,
+#' refers to paper, please!
 #'
-#' @param df A data.frame contains specificity, which from \code{ts_psi},
+#' @param lst List of two data.frame. one of them contains psi values with their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+#' index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
 #' \code{ts_expr}.
-#' @param ymax numeric. maximum in ylim. Default 12.
+#' @param ymax Numeric. maximum of y limitation. Default 12.
 #' @importFrom gplots rich.colors
 #' @importFrom graphics legend
 #' @importFrom graphics lines
@@ -30,7 +34,7 @@
 #'                              identifier = "AS_events")
 #' plot_density(result)
 #' }
-plot_density <- function(df,
+plot_density <- function(lst,
                          ymax = 12) {
   #1:Backgroundcolor for all graphs, 2: Foregroundcolor for all graphs (E6E6E6),
   #3: Fill for histograms, 4: Red, for boxplots, 5: Blue, for boxplots, 6: Green,
@@ -42,6 +46,9 @@ plot_density <- function(df,
                                "#00A2FF",
                                "#00CC00",
                                "#E0E0E0"))(7)
+  if (!is.numeric(ymax) | (ymax <= 0)) {
+    stop("ymax must be a numeric and larger than 0!")
+  }
   opar<-par(no.readonly = TRUE)
   # pdf(file= filename, height=9, width=12)
   par(cex.main = 0.95,
@@ -53,11 +60,12 @@ plot_density <- function(df,
   palette(rev(rich.colors(10)))
   #palette(rev(blues9))
 
+  df <- lst$raw
   plot(density(df[, "Tau"], n = 1000),
        main = " ",
        xlab = "Tissue specificity",
        col = (1), lwd = 4, lty = 1,
-       ylim = c(0, 12),
+       ylim = c(0, ymax),
        xlim = c(-0.1, 1.1)
   )
   lines(density(df[, "Gini"], n = 1000), col = (2), lwd = 4, lty = 2)
@@ -85,21 +93,22 @@ plot_density <- function(df,
 ###########################
 #         heatpam         #
 ###########################
-#' heatmap for subset specificity expression
+#' Heatmap for subset specific-expression
 #'
-#' Wrapper function derived from pheatmap. Use the results of \code{ts_expr}
-#' or \code{ts_psi} as Input.
+#' Wrapper function derived from \code{pheatmap}. Use the results of
+#' \code{ts_expr} or \code{ts_psi} as Input. Using pheatmap youself may be
+#' better for yourwork sometimes.
 #'
-#' @param df List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.
-#' @param dat_type "raw" or "bin". Plot raw data(psi/FPKM/RPKM/TPM) or
-#' bin(binary index). Default "raw". "raw" work with \code{specificity}, and
+#' @param lst List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.
+#' @param dat_type "raw" or "bin". Plot "raw"(psi/FPKM/RPKM/TPM) or
+#' "bin"(binary index). Default "raw". "raw" work with \code{specificity}, and
 #' "bin" work with \code{Ib}.
-#' @param specificity numeric. Cutoff of specificity, work with
-#' \code{dat_type}="raw". Default 0.8.
-#' @param ts_method specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
-#' "Hg", "Zscore", "SPM", "PEM".
-#' @param Ib integer. Cutoff of binary index, work with \code{dat_type}="bin".
-#' @param ... parameters of pheatmap pkg.
+#' @param specificity Vector of range, numeric. Region of specificity to plot,
+#' work with \code{dat_type}="raw". Default \code{c(0.8, 1)}.
+#' @param ts_method Specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
+#' "Hg", "Zscore", "Spm" or "Pem".
+#' @param Ib Integer. Cutoff of binary index, work with \code{dat_type}="bin".
+#' @param ... parameters of \code{pheatmap} pkg.
 #' @importFrom pheatmap pheatmap
 #' @importFrom grDevices colorRampPalette
 #' @importFrom grDevices palette
@@ -115,7 +124,7 @@ plot_density <- function(df,
 #'                              identifier = "AS_events")
 #' plot_heatmap(result)
 #' plot_heatmap(result, dat_type = "bin", Ib = 2)
-plot_heatmap <- function(df,
+plot_heatmap <- function(lst,
                          dat_type = "raw",
                          specificity = c(0.8, 1),
                          ts_method = "Tau",
@@ -127,10 +136,14 @@ plot_heatmap <- function(df,
                               "#FFFF00",
                               "#FF9900",
                               "#FF0000"))(100)
+  if (!is.list(lst) | !(length(names(lst)) == 2)) {
+    stop("lst maybe fault input data!")
+  }
+
   if (dat_type == "raw") {
     reg <- range(specificity)
     if (is.numeric(specificity) & (length(reg) == 2) & (reg[1] >= 0) & (reg[2] <= 1)) {
-      df <- df$raw
+      df <- lst$raw
       tissue_num <- ncol(df) - 11
       df <- df[order(as.vector(df[, ts_method])), ]
       df2plot <- df[which((df[, ts_method] >= reg[1]) & (df[, ts_method] <= reg[2])), 1:tissue_num]
@@ -147,9 +160,9 @@ plot_heatmap <- function(df,
       stop("specificity must be numeric vector and range from 0 to 1!")
     }
   } else if (dat_type == "bin") {
-    tissue_num <- ncol(df$bin) - 2
+    df <- lst$bin
+    tissue_num <- ncol(df) - 2
     if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
-      df <- df$bin
       df2plot <- df[which(df$Ib == Ib), 1:tissue_num]
       if (Ib < tissue_num/2) {
         df2plot <- sort_dat_in(df2plot)
@@ -168,7 +181,8 @@ plot_heatmap <- function(df,
     } else {
         stop("Ib must be integer and range from 1 to tissue numbers!")
     }
+  } else {
+    stop("dat_type must be one of 'raw' and 'bin'!")
   }
 }
-
 

@@ -52,37 +52,39 @@ ts_bin <- function(df,
 ##############################
 #' Calculate specificity of psi
 #'
-#' \code{ts_psi} returns the list of original data with specificities of 10
-#' methods.
+#' Function to find tissue-specific AS-events for a given data.frame.
 #'
 #' Function to detect tissue-specific AS events, and return a list with 2
-#' data.frames, which contain raw values and binary pattern values and their
-#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-#' "Hg", "Z", "Spm". Rows with NA will be dropped. Of the binary pattern, all
-#' values betwwen min and max in the data.frame will be graded into n
-#' equal-width-intervals and assign the rank 0 to (n+1), respectively.
+#' data.frames, which contain psi values and binary pattern values and their
+#' specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
+#' all values betwwen min and max in the data.frame will be graded into n
+#' equal-width-intervals and then assign the rank 0(unexpressed) to \code{n+1}.
 #'
-#' @param df data.frame, which contain psi vaules.
-#' @param n Integer. Cut the psi values into (n+2) equal-width-intervals.
-#' Default 10.
-#' @param min Numeric. The values under min will be graded into rank 0.
-#' Defaut 0.
-#' @param max Numeric. The values over max will be graded into rank (n+1).
-#' Default 100.
-#' @param tissues Vector of charactors, at leat 2. Analysed Tissues' unique
-#' identifier, and must keep away from "Tau", "Gini", "Tsi", "Counts", "Ee",
-#' "Pem", "Hg", "Z", "Spm", "Mean" and "Max".
-#' @param identifier Charactor. The colname of unique identifier for row
-#' symbols, like "gene_id" or "AS_events".
-#' @param na.del Logical. Weather NA will be dropped. Default TRUE.
-#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
-#' Specificity method Counts.
-#' @param mingap integer. Minimal gap to generate binary pattern. Default 3.
+#' @param df data.frame, which contain psi vaules. One column is the names of
+#' symbols, like AS events id, etc.
+#' @param n Integer. \code{n+2} equal-width-intervals be generated of all psi
+#' values. Default 10.
+#' @param min Numeric. The values under \code{min} will be graded into rank
+#' 0(unexpressed). Defaut 0.
+#' @param max Numeric. The values over \code{max} will be graded into rank
+#' \code{n+1}(highest). Default 100.
+#' @param tissues Vector of charactors, at leat length of 2. Analysed
+#' Tissues' unique identifier, and must keep away from "Tau", "Gini", "Tsi",
+#' "Counts", "Ee", "Pem", "Hg", "Z", "Spm", "Ib", "Type", "Mean" and "Max",
+#' exactly.
+#' @param identifier Charactor, length of 1. The colname of unique identifier
+#' for row symbols, like "gene_id", "AS_events", etc.
+#' @param na.del Logical. Whether NAs will be dropped. Default TRUE.
+#' @param cutoff Numeric. Values under \code{cutoff} will set to 0(unexpressed)
+#' in Specificity method "Counts".
+#' @param mingap Integer. Minimal gap of generating binary pattern, Please
+#' refer the paper. Default 3.
 #' @importFrom stats na.omit
-#' @return Specificity of psi values in \code{df}. A list with 2 data.frames,
-#' which contain raw values and binary pattern values and their specificty
-#' values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem", "Hg",
-#' "Z", "Spm".
+#' @return List of two data.frame. one of them contains psi values with their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+#' index binary "Ib"(named "bin").
 #' @export
 #' @examples
 #' ts_psi(tmp_psi,
@@ -140,42 +142,45 @@ ts_psi <- function(df,
 #############################
 ### For gene expression
 #############################
-#' Calculate specificity for a given gene expression data.frame
+#' Calculate specificity for gene expression
+#'
+#' Function to find tissue-specific gene expression for a given data.frame.
 #'
 #' Function to detect tissue specific gene, and return a list with 2
 #' data.frames, which contain raw values and binary pattern values and their
-#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-#' "Hg", "Z", "Spm".
-#' Rows with NA will be dropped. Of the binary pattern, all values betwwen min
-#' and max in the data.frame will be graded into n equal-width-intervals or n
-#' equal-density-intervals and assign the rank 0 to (n+1), respectively.
+#' specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
+#' all values betwwen \code{min} and \code{max} in the data.frame will be
+#' graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
+#' and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 #'
-#' @param df data.frame, which contain gene expression vaules.
-#' @param binary "seq" or "quant". Binary method, "seq" refer to
+#' @param df data.frame, which contain psi vaules. One column is the names of
+#' symbols, like gene id, etc.
+#' @param binary "seq" or "quant". Binary-intervals method, "seq" refer to
 #' equal-width-intervals and "quant" refer to equal-density-intervals.
-#' @param n Integer. Cut the gene expression values into (n+2)
-#' equal-density-intervals. Default 10.
-#' @param min Numeric. The values under min will be graded into rank 0.
-#' Defaut 0. Be careful when used with \code{trans}.
-#' @param max Numeric. The values over max will be graded into rank (n+1).
-#' Default 16. Be careful when used with \code{trans}.
-#' @param step Numeric. Width of intervals in "seq" method. Be careful when
-#' used with \code{trans}.
-#' @param trans Charactor. "log2", "log2_QN", "QN". "QN" means
+#' @param n Integer. \code{n+2} "seq" or "quant" intervals be generated of all
+#' expression values. Default 10.
+#' @param min Numeric. The values under \code{min} will be graded into rank
+#' 0(unexpressed). Be careful when used with \code{trans}. Defaut 0.
+#' @param max Numeric. The values over \code{max} will be graded into rank
+#' \code{n+1}(highest). Default 16.
+#' @param step Numeric. Width of intervals in \code{binary} "seq" method. Be
+#' careful when used with \code{trans}.
+#' @param trans Charactor. one of "log2", "log2_QN", "QN". "QN" means
 #' \code{quantile.normolize}.
-#' @param tissues Vector of charactors, at leat 2. Analysed Tissues' unique
-#' identifiers, and must keep away from "Tau", "Gini", "Tsi", "Counts", "Ee",
-#' "Pem", "Hg", "Z", "Spm", "Mean" and "Max".
-#' @param identifier Charactor. The colname of unique identifiers for row
-#' symbols, like "gene_id" or "AS_events".
-#' @param na.del Logical. Weather NA will be dropped. Default TRUE.
-#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
-#' Specificity method Counts.
-#' @param mingap integer. Minimal gap to generate binary pattern. Default 2.
-#' @return Specificity of gene expression values in \code{df}. A list with 2
-#' data.frames, which contain raw values and binary pattern values and their
-#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-#' "Hg", "Z", "Spm".
+#' @param tissues Vector of charactors, at leat length of 2. Analysed Tissues'
+#' unique identifiers, and must exactly keep away from "Tau", "Gini", "Tsi",
+#' "Counts", "Ee", "Pem", "Hg", "Z", "Spm", "Ib", "Type", "Mean" and "Max".
+#' @param identifier Charactor. Length of 1. The colname of unique identifiers
+#' for records, like "gene_id", "AS_events", etc.
+#' @param na.del Logical. Whether NAs will be dropped. Default TRUE.
+#' @param cutoff Numeric. Values under \code{cutoff} will set to 0(unexpressed)
+#' in Specificity method "Counts".
+#' @param mingap Integer. Minimal gap of generating binary pattern. Default 2.
+#' @return List of two data.frame. one of them contains expression values with
+#' their specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee",
+#' "Pem", "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values
+#' and index binary "Ib"(named "bin").
 #' @export
 #' @examples
 #' ts_psi(tmp_tpm,
