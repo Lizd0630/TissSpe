@@ -1,6 +1,21 @@
-# Function require a vector with expression of one gene in different tissues.
-# If expression for one tissue is not known, gene specificity for this gene is NA
-# Minimum 2 tissues
+#######################
+# specificity methods #
+#######################
+# N is the number of tissues in the data set, n is the number of tissues
+# expressed; X is the maximal specificity value for a certain gene among all
+# tissues, maxX is maximal values.
+
+#' Tau
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA. Minimum 2 tissues.
+#'
+#' @param x A numeric vector.
+#' @examples
+#' \dontrun{
+#' ts_Tau(c(1,2,3,2,8))
+#' }
 ts_Tau <- function(x)
 {
   if(all(!is.na(x)))
@@ -27,8 +42,19 @@ ts_Tau <- function(x)
 }
 
 
-# Function require a vector with expression of one gene in different tissues.
-# If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' Gini
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA. Transformation: x*(N/(N-1)).
+#'
+#' @param x A numeric vector.
+#' @importFrom DescTools Gini
+#' @examples
+#' \dontrun{
+#' ts_Gini(c(1,2,3,2,8))
+#' }
 ts_Gini <- function(x)
 {
   if(all(!is.na(x)))
@@ -53,8 +79,18 @@ ts_Gini <- function(x)
 }
 
 
-#Function require a vector with expression of one gene in different tissues.
-#If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' Tsi
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA.
+#'
+#' @param x A numeric vector.
+#' @examples
+#' \dontrun{
+#' ts_Tsi(c(1,2,3,2,8))
+#' }
 ts_Tsi <- function(x)
 {
   if(all(!is.na(x)))
@@ -79,14 +115,27 @@ ts_Tsi <- function(x)
 }
 
 
-#Function require a vector with expression of one gene in different tissues.
-#If expression for one tissue is not known, gene specificity for this gene is NA
-#Function requires setting of a treshold (PSI)
-ts_Counts <- function(x, min)
+
+#' Counts
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA. Function requires setting of a \code{cutoff} (rpkm/FPKM/TPM).
+#' Transformation: (1-x/N)*(N/(N-1)).
+#'
+#' @param x A numeric vector.
+#' @param cutoff numeric. values under \code{cutoff} will be set to
+#' 0(unexpression).
+#'
+#' @examples
+#' \dontrun{
+#' ts_Counts(c(0,1,2,3,2,8), cutoff = 1)
+#' }
+ts_Counts <- function(x, cutoff)
 {
   if(all(!is.na(x)))
   {
-    res <- length(which(x > min))
+    res <- length(which(x > cutoff))
     if (res > 0)
     {
       res <- (1 - res/length(x))*(length(x)/(length(x)-1))  #Modification: To bring to normalized scale
@@ -99,8 +148,18 @@ ts_Counts <- function(x, min)
 }
 
 
-#Function require a data frame with expression data, and give back a vector with EEi values for each gene
-#If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' Ee
+#'
+#' Function require a data frame with expression data, and give back a vector
+#' with EEi values for each gene. If expression for one tissue is not known,
+#' gene specificity for this gene is NA. Transformation: x/maxX.
+#'
+#' @param x data.frame.
+#' @examples
+#' \dontrun{
+#' ts_Ee(tmp_tpm)
+#' }
 ts_Ee <- function(x)
 {
   if(!all(is.na(x)))
@@ -121,8 +180,18 @@ ts_Ee <- function(x)
 }
 
 
-#Function require a data frame with expression data, and give back a vector with PEM scores
-#If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' Pem
+#'
+#' Function require a data frame with expression data, and give back a vector
+#' with PEM scores. If expression for one tissue is not known, gene specificity
+#' for this gene is NA. Transformation: x/(maxX).
+#'
+#' @param x data.frame.
+#' @examples
+#' \dontrun{
+#' ts_Ee(tmp_tpm)
+#' }
 ts_Pem <- function(x)
 {
   if(!all(is.na(x)))
@@ -147,9 +216,19 @@ ts_Pem <- function(x)
 }
 
 
-#Hg entropy
-#Function require a vector with expression of one gene in different tissues.
-#If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' Hg, entropy
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA. Transformation: 1-x/log2N.
+#'
+#' @param x A numeric vector.
+#'
+#' @examples
+#' \dontrun{
+#' ts_Hg(c(0,1,2,3,2,8))
+#' }
 ts_Hg <- function(x)
 {
   if(all(!is.na(x)))
@@ -176,9 +255,19 @@ ts_Hg <- function(x)
 }
 
 
-#Z-score
-#Function require a vector with expression of one gene in different tissues.
-#If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' Z-score
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA. Transformation: x/n-1/sqrt(N).
+#'
+#' @param x data.frame.
+#'
+#' @examples
+#' \dontrun{
+#' ts_Z(c(0,1,2,3,2,8))
+#' }
 ts_Z <- function(x)
 {
   if(all(!is.na(x)))
@@ -193,9 +282,19 @@ ts_Z <- function(x)
 }
 
 
-#SPM score from TISGED
-#Function require a vector with expression of one gene in different tissues.
-#If expression for one tissue is not known, gene specificity for this gene is NA
+
+#' SPM score from TISGED
+#'
+#' Function require a vector with expression of one gene in different tissues.
+#' If expression for one tissue is not known, gene specificity for this gene is
+#' NA. Transformation: maxX.
+#'
+#' @param x A numeric vector.
+#'
+#' @examples
+#' \dontrun{
+#' ts_Spm(c(0,1,2,3,2,8))
+#' }
 ts_Spm <- function(x)
 {
   if(all(!is.na(x)))
@@ -204,7 +303,7 @@ ts_Spm <- function(x)
     {
       if(sum(x) !=0)
       {
-        spm <- x^2/(x%*%x)
+        spm <- x^2/as.vector(x%*%x)
         res <- max(spm) #Modification:To bring to normalized scale. Choose max
       } else {
         res <- 0
@@ -219,4 +318,5 @@ ts_Spm <- function(x)
   }
   return(res)
 }
+
 

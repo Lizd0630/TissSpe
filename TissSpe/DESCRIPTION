@@ -1,14 +1,21 @@
 Package: TissSpe
 Type: Package
 Title: Caculate tissue-specific index
-Version: 0.1.0
-Author@R: person(given = "Zhidan", family = "Li", email = "lzd_hunan@126.com", role = c("aut", "cre"))
+Version: 1.0.0
+Authors@R: person(given = "Zhidan", family = "Li", email = "lzd_hunan@126.com", role = c("aut", "cre"))
 Maintainer: Zhidan Li <lzd_hunan@126.com>
-Description: This package implements method to caculate tissue-specific index 
-    for gene experession, alternative splicing events PSI.
+Description: This package implements methods to caculate tissue-specific index
+    for gene experession, alternative splicing events PSI: "Tau", "Gini",
+    "Tsi", "Counts", "Ee", "Pem", "Hg", "Z", "Spm", "Ib".
+    reference: 1) A benchmark of gene expression tissue-specificity metrics, Briefings in Bioinformatics, 18(2), 2017, 205–214; 2) Genome-wide midrange transcription profiles reveal expression level relationships in human tissue specification, BIOINFORMATICS, 21(5) 2005, 650–659.
+Depends:
+    R (>= 2.10)
 Imports:
-pheatmap,
-DescTools
-License: What license is it under?
+    DescTools,
+    preprocessCore,
+    gplots,
+    pheatmap
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+RoxygenNote: 6.1.1

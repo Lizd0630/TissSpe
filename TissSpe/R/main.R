@@ -1,171 +1,245 @@
-# Function to detect tissue specific gene or AS events
-# df: data.frame without
-# names(meths) <- c("Tau", "Gini", "Tsi", "Counts", "Ee", "Pem", "Hg", "Z", "Spm")
-# binary: "seq", "quant", "none"
+##############################
+### For caculate specificity
+##############################
+#' Calculate specificity for a given numeric data.frame
+#'
+#' Function to calculate specificity for a given numeric data.frame and return
+#' a data.frame with original value with specificity index of 9 methhods.
+#'
+#' @param df data.frame of numeric.
+#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
+#' Specificity method Counts.
+#' @return data.frame with original value with specificity index of 9 methhods.
+ts_index <- function(df,
+                     cutoff = 1) {
+  df$Tau <- apply(df, 1, ts_Tau)
+  df$Gini <- apply(df, 1, ts_Gini)
+  df$Tsi <- apply(df, 1, ts_Tsi)
+  df$Counts <- apply(df, 1, function(x) {x <- ts_Counts(x, cutoff)})
+  df$Hg <- apply(df, 1, ts_Hg)
+  df$Zscore <- ts_Z(df)
+  df$Spm <- apply(df, 1, ts_Spm)
+  df$Ee <- ts_Ee(df)
+  df$Pem <- ts_Pem(df)
 
-ts_sp <- function(df,
-                  method = "Tau",
-                  binary = "seq",
+  df$Mean <- apply(df, 1, expr_mean)
+  df$Max <- apply(df, 1, expr_max)
+  return(df)
+}
+
+
+
+#' Calculate binary index for a given ranks data.frame
+#'
+#' Function to calculate binary index(0/1) for a given ranks data.frame and
+#' return a data.frame with ranks with binary index and phenotype("DE" or "UC").
+#'
+#' @param df data.frame of ranks.
+#' @param mingap integer. Minimal gap to generate binary pattern. Default 3.
+#' @return data.frame with ranks with binary index and phenotype("DE" or "UC").
+ts_bin <- function(df,
+                   mingap = 3) {
+  res <- t(apply(df, 1, function(x) {bin_index(x, mingap = mingap)}))
+  df$Ib <- as.integer(res[, 1])
+  df$Type <- res[, 2]
+  return(df)
+}
+
+
+
+##############################
+### For AS events psi
+##############################
+#' Calculate specificity of psi
+#'
+#' \code{ts_psi} returns the list of original data with specificities of 10
+#' methods.
+#'
+#' Function to detect tissue-specific AS events, and return a list with 2
+#' data.frames, which contain raw values and binary pattern values and their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm". Rows with NA will be dropped. Of the binary pattern, all
+#' values betwwen min and max in the data.frame will be graded into n
+#' equal-width-intervals and assign the rank 0 to (n+1), respectively.
+#'
+#' @param df data.frame, which contain psi vaules.
+#' @param n Integer. Cut the psi values into (n+2) equal-width-intervals.
+#' Default 10.
+#' @param min Numeric. The values under min will be graded into rank 0.
+#' Defaut 0.
+#' @param max Numeric. The values over max will be graded into rank (n+1).
+#' Default 100.
+#' @param tissues Vector of charactors, at leat 2. Analysed Tissues' unique
+#' identifier, and must keep away from "Tau", "Gini", "Tsi", "Counts", "Ee",
+#' "Pem", "Hg", "Z", "Spm", "Mean" and "Max".
+#' @param identifier Charactor. The colname of unique identifier for row
+#' symbols, like "gene_id" or "AS_events".
+#' @param na.del Logical. Weather NA will be dropped. Default TRUE.
+#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
+#' Specificity method Counts.
+#' @param mingap integer. Minimal gap to generate binary pattern. Default 3.
+#' @importFrom stats na.omit
+#' @return Specificity of psi values in \code{df}. A list with 2 data.frames,
+#' which contain raw values and binary pattern values and their specificty
+#' values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem", "Hg",
+#' "Z", "Spm".
+#' @export
+#' @examples
+#' ts_psi(tmp_psi,
+#'        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+#'                    "sample_E", "sample_F", "sample_G", "sample_H",
+#'                    "sample_I", "sample_J", "sample_K", "sample_L",
+#'                    "sample_M", "sample_N", "sample_O", "sample_P",
+#'                    "sample_Q"),
+#'                    identifier = "AS_events")
+ts_psi <- function(df,
                   n = 10,
-                  min = 0.2,
-                  max = 2,
-                  norm_meth = "",
+                  min = 0,
+                  max = 100,
+                  tissues,
+                  identifier,
+                  na.del = TRUE,
                   cutoff = 1,
-                  name_vect,
-                  identifier) {
-  df <- na.omit(df)
-  if(norm_meth == "log_QN") {
-    dt <- df[, c(-1)]
-    dt[dt < cutoff] <- 1
-    dt <- log2(dt)
-    cutoff <- log2(cutoff)
-    df[, c(-1)] <- quant_norm(dt)
-  } else if (norm_meth == "QN") {
-    dt <- df[, c(-1)]
-    dt[dt < cutoff] <- 0
-    df[, c(-1)] <- quant_norm(dt)
-  } else if (norm_meth == "log") {
-    dt <- df[, c(-1)]
-    dt[dt < cutoff] <- 1
-    df[, c(-1)] <- log2(dt)
-    cutoff <- log2(cutoff)
+                  mingap = 3) {
+  ## format data.frame
+  if (is.vector(tissues) & length(tissues) >= 2) {
+    df <- fmt_df(df = df, tissues = tissues, identifier = identifier)
   } else {
-    dt <- df[, c(-1)]
-    dt[dt < cutoff] <- 0
-    df[, c(-1)] <- dt
+    stop("tissues must be a vector with length at least 2!")
   }
-  df <- rep_mean(df, name_vect, identifier)
-  df$Max <- apply(df[,c(-1)], c(1), expr_max)
-  df <- df[df$Max > cutoff,]
-  df <- df[, c(-length(colnames(df)))]
 
+  ## wheather remove NA
+  if (na.del == TRUE) {
+    df <- na.omit(df)
+  }
 
+  df <- rep_mean(df = df, tissues = tissues)
 
-  df_bin <- switch (binary,
-              seq = seq_cut(df = df, n = n),
-              quant = quant_cut(df = df, n = n, min = min, max = max),
-              none = df
-            )
+  ## binary type
+  df_list <- list(raw = df, bin = psi_seq_rank(df = df, n = n, min = min, max = max))
+#  if (binary == "seq") {
+#    df_list <- list(raw = df, bin = seq_rank(df = df, n = n, min = min, max = max))
+#  } else if (binary == "quant") {
+#    df_list <- list(raw = df, bin = quant_rank(df = df, n = n, min = min, max = max))
+#  } else {
+#    stop("binary type error!")
+#  }
 
-  switch (meth,
-    Tau = ts_Tau(df),
-    Gini = ts_Gini(df),
-    Tsi = ts_Tsi(df),
-    Counts = ts_Counts(df),
-    Ee = ts_Ee(df),
-    Pem = ts_Pem(df),
-    Hg = ts_Hg(df),
-    Z = ts_Z(df),
-    Spm = ts_Spm(df)
-    )
+  ## calculate tissue specificity
+  df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
+  #df_list[[2]] <- ts_index(df_list[[2]], cutoff = cutoff)
+  df_list[[2]] <- ts_bin(df_list[[2]], mingap = mingap)
+  return(df_list)
 }
 
 
 
 
 
-###+++###
-#Calculate and save tissue specificity parameters
-#orgPSI = data set, PSI = cutt off, add = number of tissues, tNames = tissues to use, tNamesNew = tissues to name, RNAseq = how to normalise (log_QN, QN, log, NA)
-#Only genes with Ensembl IDs are used, or for Drosophila
-#Normalization is done on all tissues, not dependent which tissues are selected later
-#1. Data are normalized
-#2. All expression under PSI is set to 0
-#3. Replicates mean is calculated (fReplicateMean)
-#4. Genes that not expressed in any tissue are removed
-#5. Tissue specificity parameters are calculated
-fTS <- function(orgPSI, PSI, add, tNames, tNamesNew, RNAseq)
-{
-  orgPSI <- na.omit(orgPSI)
-  print(summary(orgPSI))
-  if(RNAseq == "log_QN"){
-    x <- orgPSI[,c(-1)]
-    x[x < PSI] <- 1
-    x <- log2(x)
-    PSI <- log2(PSI)
-    orgPSI[,c(-1)] <- fQN(x)
-  } else if (RNAseq == "QN")  {
-    x <- orgPSI[,c(-1)]
-    x[x < PSI] <- 0
-    orgPSI[,c(-1)] <- fQN(x)
-  } else if (RNAseq == "log")  {
-    x <- orgPSI[,c(-1)]
-    x[x < PSI] <- 1
-    orgPSI[,c(-1)] <- log2(x)
-    PSI <- log2(PSI)
+
+#############################
+### For gene expression
+#############################
+#' Calculate specificity for a given gene expression data.frame
+#'
+#' Function to detect tissue specific gene, and return a list with 2
+#' data.frames, which contain raw values and binary pattern values and their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm".
+#' Rows with NA will be dropped. Of the binary pattern, all values betwwen min
+#' and max in the data.frame will be graded into n equal-width-intervals or n
+#' equal-density-intervals and assign the rank 0 to (n+1), respectively.
+#'
+#' @param df data.frame, which contain gene expression vaules.
+#' @param binary "seq" or "quant". Binary method, "seq" refer to
+#' equal-width-intervals and "quant" refer to equal-density-intervals.
+#' @param n Integer. Cut the gene expression values into (n+2)
+#' equal-density-intervals. Default 10.
+#' @param min Numeric. The values under min will be graded into rank 0.
+#' Defaut 0. Be careful when used with \code{trans}.
+#' @param max Numeric. The values over max will be graded into rank (n+1).
+#' Default 16. Be careful when used with \code{trans}.
+#' @param step Numeric. Width of intervals in "seq" method. Be careful when
+#' used with \code{trans}.
+#' @param trans Charactor. "log2", "log2_QN", "QN". "QN" means
+#' \code{quantile.normolize}.
+#' @param tissues Vector of charactors, at leat 2. Analysed Tissues' unique
+#' identifiers, and must keep away from "Tau", "Gini", "Tsi", "Counts", "Ee",
+#' "Pem", "Hg", "Z", "Spm", "Mean" and "Max".
+#' @param identifier Charactor. The colname of unique identifiers for row
+#' symbols, like "gene_id" or "AS_events".
+#' @param na.del Logical. Weather NA will be dropped. Default TRUE.
+#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
+#' Specificity method Counts.
+#' @param mingap integer. Minimal gap to generate binary pattern. Default 2.
+#' @return Specificity of gene expression values in \code{df}. A list with 2
+#' data.frames, which contain raw values and binary pattern values and their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm".
+#' @export
+#' @examples
+#' ts_psi(tmp_tpm,
+#'        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+#'                    "sample_E", "sample_F", "sample_G", "sample_H",
+#'                    "sample_I", "sample_J", "sample_K", "sample_L",
+#'                    "sample_M", "sample_N", "sample_O", "sample_P"),
+#'                    identifier = "gene_id")
+ts_expr <- function(df,
+                    binary = "seq",
+                    n = 12,
+                    min = 0,
+                    max = 16,
+                    step = 1,
+                    trans = "log2_QN",
+                    tissues,
+                    identifier,
+                    na.del = TRUE,
+                    cutoff = 1,
+                    mingap = 2) {
+  ## format data.frame
+  if (is.vector(tissues) & length(tissues) >= 2) {
+    df <- fmt_df(df = df, tissues = tissues, identifier = identifier)
   } else {
-    x <- orgPSI[,c(-1)]
-    x[x < PSI] <- 0
-    orgPSI[,c(-1)] <- x
+    stop("tissues must be a vector with length at least 2!")
   }
-  orgPSI <- fReplicateMean(orgPSI, organism, paste("Averaged.PSI.",tissuesNames, sep=""))
-  orgPSI$Max <- apply(orgPSI[,c(-1)], c(1), fmax)
-  orgPSI <- orgPSI[orgPSI$Max > PSI,]
-  orgPSI <- orgPSI[,c(-length(colnames(orgPSI)))]
-  print(summary(orgPSI))
-  fPlotExpression(orgPSI[,-1], paste("Normalized expression (cutoff", 2^PSI, "PSI)", sep=" "), paste("NormalizedQN_", 2^PSI,"PSI", sep=""), tissuesPrintNames)
 
-  orgPSI <- orgPSI[,c("SpliceJunction", paste("Averaged.PSI.", tNames,sep="")) ]
-  colnames(orgPSI) <- c("SpliceJunction", paste("Averaged.PSI.", tNamesNew, sep=""))
-  nTissues <- length(tNamesNew)
-  tissuesNames <- tNamesNew
-  print(paste("Analysis done on", nTissues, "tissue:", sep=" "))
-  print(tissuesNames)
+  ## wheather remove NA
+  if (na.del == TRUE) {
+    df <- na.omit(df)
+  }
 
-  orgPSI$Tau <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fTau)
-  orgPSI$Gini <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fGini)
-  orgPSI$Tsi <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fTsi)
-  orgPSI$Counts <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, function(x){x <- fCounts(x, PSI)})
-  orgPSI$Hg <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fHg)
-  orgPSI$Zscore <- fZ(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))])
-  orgPSI$Spm <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fSpm)
-  orgPSI$Ee <- fEe(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))])
-  orgPSI$Pem <- fPem(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))])
+  if (trans == "log2_QN") {
+    df[df < cutoff] <- 1
+    df <- quant_norm(log2(df))
+    cutoff <- log2(cutoff)
+  } else if (trans == "log2") {
+    df[df < cutoff] <- 1
+    df <- log2(df)
+    cutoff <- log2(cutoff)
+  } else if (trans == "QN") {
+    df[df < cutoff] <- 0
+    df <- quant_norm(df)
+  } else {
+    df  <- df
+  }
 
-  orgPSI$Mean <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fmean)
-  orgPSI$Max <- apply(orgPSI[,c(paste("Averaged.PSI.", tissuesNames[1:nTissues], sep=""))], 1, fmax)
+  ## calculate mean of replicates
+  df <- rep_mean(df = df, tissues = tissues)
 
-  print(summary(orgPSI))
+  ## binary type
+  if (binary == "seq") {
+    df_list <- list(raw = df, bin = expr_seq_rank(df = df, n = n, min = min, step = step))
+  } else if (binary == "quant") {
+    df_list <- list(raw = df, bin = expr_quant_rank(df = df, n = n, min = min, max = max))
+  } else {
+    stop("binary type error!")
+  }
 
-  p <- c("Tau", "Gini", "Tsi", "Counts", "Ee", "Hg", "Zscore", "Spm", "Pem")
-  x <- as.matrix(orgPSI[,p])
-  xs <- cor(x, method="spearman")
-  xp <- cor(x, method="pearson")
-  capture.output(c("Spearman correlation"),file=paste(folder, organism,"CorrelationTS_", add, ".txt", sep=""))
-  capture.output(xs, append=TRUE, file=paste(folder, organism, "CorrelationTS_", add, ".txt", sep=""))
-  capture.output(c("Pearson correlation"), append=TRUE, file=paste(folder, organism,"CorrelationTS_", add, ".txt", sep=""))
-  capture.output(xp, append=TRUE, file=paste(folder, organism,"CorrelationTS_", add, ".txt", sep=""))
-
-  # dev.new(height=9, width=12)
-  #pdf(file=paste(folder, organism, expDataSource, "TScomparison_9_",  add,".pdf", sep=""), height=9, width=12)
-  par(cex.main=0.95, bg=my.col[1], fg=my.col[2], col.axis=my.col[2], col.lab=my.col[2], col.main=my.col[2])
-  palette(rev(rich.colors(10)))
-  #palette(rev(blues9))
-
-  plot(density(orgPSI[,"Tau"],n=1000), main = " ", xlab="Tissue specificity",col=(1), lwd=4, lty=1
-       ,ylim=c(0,8), xlim=c(-0.1,1.1)
-  )
-  lines(density(orgPSI[,"Gini"],n = 1000), col=(2), lwd=4, lty=2)
-  lines(density(orgPSI[,"Tsi"],n = 1000), col=(3), lwd=4, lty=1)
-  lines(density(orgPSI[,"Counts"],n = 1000), col=(4), lwd=4, lty=2)
-  lines(density(orgPSI[,"Ee"],n = 1000), col=(5), lwd=4, lty=1)
-  lines(density(orgPSI[,"Hg"],n = 1000), col=(6), lwd=4, lty=2)
-  lines(density(orgPSI[,"Zscore"],n = 1000), col=(7), lwd=4, lty=1)
-  lines(density(orgPSI[,"Spm"],n = 1000), col=(8), lwd=4, lty=2)
-  lines(density(orgPSI[,"Pem"],n = 1000), col=(9), lwd=4, lty=1)
-
-  legend("topright",c("Tau", "Gini", "TSI", "Counts", "EE", "Hg", "Zscore", "SPM", "PEM"),col=(1:11), lwd=4, lty=c(1,2), bty="n", seg.len=4)
-
-  # dev.copy2pdf(device=quartz, file=paste(folder, organism, expDataSource, "TScomparison_PSI_",  add,".pdf", sep=""),onefile=TRUE)#,paper="A4r"
-  #dev.off()
-
-  write.table(orgPSI, file=paste(folder, organism,"TScomparisonTable_PSI_",  add,".txt",sep=""), row.names = FALSE, col.names=TRUE, quote = FALSE)
-
-  fScatPlot(orgPSI, "Tau", c("Gini", "Tsi", "Counts", "Hg", "Zscore","Spm", "Ee", "Pem"), add, c(0, 0.94, 4, 0.5))
-  fScatPlot2(orgPSI, "Mean", c("Tau", "Gini", "Tsi", "Counts", "Hg", "Zscore", "Spm", "Ee", "Pem"), add, c(ceiling(max(orgPSI$Mean)), 0.95, 2, 0.5), ceiling(max(orgPSI$Mean)))
-  fScatPlot2(orgPSI, "Max", c("Tau", "Gini", "Tsi", "Counts", "Hg", "Zscore", "Spm", "Ee", "Pem"), add, c(ceiling(max(orgPSI$Max)), 0.95, 2, 0.5), ceiling(max(orgPSI$Max)))
-
-  return()
+  ## calculate tissue specificity
+  df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
+  #df_list[[2]] <- ts_index(df_list[[2]], cutoff = cutoff)
+  df_list[[2]] <- ts_bin(df_list[[2]], mingap = mingap)
+  return(df_list)
 }
-###***###***###
+
 
