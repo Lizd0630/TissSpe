@@ -10,5 +10,5 @@ sort_dat_in(dat)
 \item{dat}{data.frame, numeric.}
 }
 \description{
-Sort rows of dataframe according row maximal value coordinate.
+Sort rows of dataframe according row minimal value coordinate.
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/dat_prep.R
 \name{expr_max}
 \alias{expr_max}
-\title{maximal expression among tissues}
+\title{maximal value of replicates}
 \usage{
 expr_max(x)
 }
@@ -10,6 +10,6 @@ expr_max(x)
 \item{x}{numeric.}
 }
 \description{
-Function require a vector with expression of one gene in different tissues.
+Function require a vector with numeric in different conditions.
 Max is calculated taking in account tissues with 0 expression: 2+0+4=4.
 }

@@ -2,14 +2,15 @@
 % Please edit documentation in R/dat_prep.R
 \name{expr_mean}
 \alias{expr_mean}
-\title{mean expression of replicates}
+\title{mean of vectors}
 \usage{
 expr_mean(x)
 }
 \arguments{
-\item{x}{numeric.}
+\item{x}{Vector, numeric.}
 }
 \description{
-Function require a vector with expression of one gene in different tissues.
-Mean is calculated taking in account tissues with 0 expression: 2+0+4=2.
+Function require a vector with numeric and then calculate the
+mean. Mean is calculated taking in account tissues with 0 expression:
+2+0+4=2.
 }

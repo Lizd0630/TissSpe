@@ -15,6 +15,10 @@ psi_seq_rank <- function(df,
                          n = 10,
                          min = 0,
                          max = 100) {
+  if (!all(apply(df, 2, is.numeric))) {
+    stop("df must be numeric!")
+  }
+
   if (min < 0 | max > 100) {
     stop("Please set min and max psi to 0-100!")
   } else {
@@ -59,6 +63,10 @@ expr_seq_rank <- function(df,
                           n = 12,
                           min = 0,
                           step = 1) {
+  if (!all(apply(df, 2, is.numeric))) {
+    stop("df must be numeric!")
+  }
+
   max = min + step * n
   df_min <- min(df, na.rm = TRUE)
   df_max <- max(df, na.rm = TRUE)
@@ -108,6 +116,10 @@ expr_quant_rank <- function(df,
                             n = 10,
                             min = 0,
                             max = 12) {
+  if (!all(apply(df, 2, is.numeric))) {
+    stop("df must be numeric!")
+  }
+
   vect <- as.vector(t(df))
   df_min <- min(vect, na.rm = TRUE)
   df_max <- max(vect, na.rm = TRUE)
@@ -143,19 +155,29 @@ expr_quant_rank <- function(df,
 
 #' binary index
 #'
-#' Function to generate binary index(0/1) of ranked data. Define gaps as the
-#' diferrence of sorted vectors(ranks, low to high), and ranks over the maximal
-#' gap set to 1, otherwise set to 0, always select the first maximal gap. If
-#' specify \code{mingap}, then ranks over the \code{mingap} set to 1, othewise
-#' set to 0. Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
+#' Function to generate binary index(the sum of \code{binary pattern}) of
+#' ranked data. Define gaps as the diferrence of sorted vector(ranks,
+#' low to high), and ranks over the maximal gap in the sorted vector set to 1,
+#' otherwise set to 0, always select the first maximal gap.
+#' If specify \code{mingap}, then ranks over the \code{mingap} set to 1, othewise
+#' set to 0. And if there has no \code{mingap} in the vector, binary index set
+#' to NA. Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
 #' \code{expr_quant_rank}. Ib is the sum of binary pattern if vector has mingap,
 #' otherwise Ib = 0.
 #'
-#' @param x integer vector, Ranks.
-#' @param mingap minimal gap to generate binary pattern.
+#' @param x Integer vector, Ranks.
+#' @param mingap Minimal gap to generate binary pattern.
 #' @return binary index with "DE"(differential exprresion) or "UC"(unclear).
 bin_index <- function(x,
                       mingap = 3) {
+  if (!is.numeric(x)) {
+    stop("x must be numeric!")
+  }
+
+  if (length(x) <= 1) {
+    stop("x must be larger than 1!")
+  }
+
   x_diff <- diff(sort(x))
   if (any(x_diff >= 3)) {
     max_index <- which(x_diff >= 3)[1]
@@ -176,9 +198,13 @@ bin_index <- function(x,
 #' Function to generate binary pattern(0/1) of ranked data. Define gaps as the
 #' diferrence of sorted vectors(ranks, low to high), and ranks over the
 #' maximal gap set to 1, otherwise set to 0, always select the first maximal
-#' gap. If specify \code{mingap}, then ranks over the \code{mingap} set to 1,
-#' othewise set to 0. Ranks value from function:\code{psi_seq_rank},
-#' \code{expr_seq_rank}, \code{expr_quant_rank}.
+#' gap.
+#' If specify \code{mingap}, then ranks over the \code{mingap} set to 1,
+#' othewise set to 0.
+#' If all values in \code{x} are identical, then all binary set to 1.
+#' If there is no \code{mingap}, all binary set to 0.
+#' Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
+#' \code{expr_quant_rank}.
 #'
 #' @param x integer vector, Ranks.
 #' @param mingap minimal gap to generate binary pattern.
@@ -187,6 +213,10 @@ bin_index <- function(x,
 #' the same rank).
 bin_pattern <- function(x,
                       mingap = 3) {
+  if (!is.numeric(x)) {
+    stop("x must be numeric!")
+  }
+
   x_diff <- diff(sort(x))
   if (any(x_diff >= 3)) {
     max_index <- which(x_diff >= 3)[1]

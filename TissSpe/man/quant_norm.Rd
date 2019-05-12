@@ -10,6 +10,7 @@ quant_norm(df)
 \item{df}{data.frame.}
 }
 \description{
-Normalize data.frame. All 0 are set to NA, to exclude them from quantile
-normalization, then 0 values (the one set to NA) are set back to 0 finally.
+Quantile-normalize data.frame. All 0 are set to NA, to exclude them from
+quantile-normalization, then 0 values (the one set to NA) are set back to
+0 finally.
 }

@@ -145,7 +145,7 @@ plot_heatmap <- function(lst,
     if (is.numeric(specificity) & (length(reg) == 2) & (reg[1] >= 0) & (reg[2] <= 1)) {
       df <- lst$raw
       tissue_num <- ncol(df) - 11
-      df <- df[order(as.vector(df[, ts_method])), ]
+      df <- df[order(-as.vector(df[, ts_method])), ]
       df2plot <- df[which((df[, ts_method] >= reg[1]) & (df[, ts_method] <= reg[2])), 1:tissue_num]
       main = paste("specificity of ", ts_method, "(", reg[1], "-", reg[2], ") and nrow =", nrow(df2plot))
       pheatmap(mat = df2plot,
@@ -165,9 +165,9 @@ plot_heatmap <- function(lst,
     if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
       df2plot <- df[which(df$Ib == Ib), 1:tissue_num]
       if (Ib < tissue_num/2) {
-        df2plot <- sort_dat_in(df2plot)
-      } else {
         df2plot <- sort_dat_de(df2plot)
+      } else {
+        df2plot <- sort_dat_in(df2plot)
       }
       main = paste("Ib =", Ib, "and nrow =", nrow(df2plot))
       pheatmap(mat = df2plot,

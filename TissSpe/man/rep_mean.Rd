@@ -13,7 +13,7 @@ rep_mean(df, tissues)
 sample replicates.}
 }
 \description{
-Function requires data frame with expression values. Mean values between
+Function requires data frame with numeric. \code{rowMeans} between
 replicates are calculated. \code{tissues} must be the unique word-start
 identifier to recognize sample replicates. \code{identifier} is the colname
 of gene names or AS events.

@@ -7,19 +7,21 @@
 bin_index(x, mingap = 3)
 }
 \arguments{
-\item{x}{integer vector, Ranks.}
+\item{x}{Integer vector, Ranks.}
 
-\item{mingap}{minimal gap to generate binary pattern.}
+\item{mingap}{Minimal gap to generate binary pattern.}
 }
 \value{
 binary index with "DE"(differential exprresion) or "UC"(unclear).
 }
 \description{
-Function to generate binary index(0/1) of ranked data. Define gaps as the
-diferrence of sorted vectors(ranks, low to high), and ranks over the maximal
-gap set to 1, otherwise set to 0, always select the first maximal gap. If
-specify \code{mingap}, then ranks over the \code{mingap} set to 1, othewise
-set to 0. Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
+Function to generate binary index(the sum of \code{binary pattern}) of
+ranked data. Define gaps as the diferrence of sorted vector(ranks,
+low to high), and ranks over the maximal gap in the sorted vector set to 1,
+otherwise set to 0, always select the first maximal gap.
+If specify \code{mingap}, then ranks over the \code{mingap} set to 1, othewise
+set to 0. And if there has no \code{mingap} in the vector, binary index set
+to NA. Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
 \code{expr_quant_rank}. Ib is the sum of binary pattern if vector has mingap,
 otherwise Ib = 0.
 }

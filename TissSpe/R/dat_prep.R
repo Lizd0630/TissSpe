@@ -1,9 +1,10 @@
-#' mean expression of replicates
+#' mean of vectors
 #'
-#' Function require a vector with expression of one gene in different tissues.
-#' Mean is calculated taking in account tissues with 0 expression: 2+0+4=2.
+#' Function require a vector with numeric and then calculate the
+#' mean. Mean is calculated taking in account tissues with 0 expression:
+#' 2+0+4=2.
 #'
-#' @param x numeric.
+#' @param x Vector, numeric.
 expr_mean <- function(x) {
   if(!all(is.na(x)))
   {
@@ -16,9 +17,9 @@ expr_mean <- function(x) {
 
 
 
-#' maximal expression among tissues
+#' maximal value of replicates
 #'
-#' Function require a vector with expression of one gene in different tissues.
+#' Function require a vector with numeric in different conditions.
 #' Max is calculated taking in account tissues with 0 expression: 2+0+4=4.
 #'
 #' @param x numeric.
@@ -57,7 +58,7 @@ fmt_df <- function(df,
 
 #' mean expression of replicates
 #'
-#' Function requires data frame with expression values. Mean values between
+#' Function requires data frame with numeric. \code{rowMeans} between
 #' replicates are calculated. \code{tissues} must be the unique word-start
 #' identifier to recognize sample replicates. \code{identifier} is the colname
 #' of gene names or AS events.
@@ -84,8 +85,9 @@ rep_mean <- function(df,
 
 #' quantile normalization
 #'
-#' Normalize data.frame. All 0 are set to NA, to exclude them from quantile
-#' normalization, then 0 values (the one set to NA) are set back to 0 finally.
+#' Quantile-normalize data.frame. All 0 are set to NA, to exclude them from
+#' quantile-normalization, then 0 values (the one set to NA) are set back to
+#' 0 finally.
 #'
 #' @param df data.frame.
 #' @importFrom preprocessCore normalize.quantiles
@@ -99,40 +101,48 @@ quant_norm <- function(df) {
 
 
 
-#' Sort data.frame (increase)
+#' Sort data.frame (decrease)
 #'
 #' Sort rows of dataframe according row maximal value coordinate.
 #'
 #' @param dat data.frame, numeric.
-sort_dat_in <- function(dat) {
-  maxindex <- apply(dat, 1, which.max)
-  new_dat <- list()
-  for (i in sort(maxindex)) {
-    a <- dat[maxindex == i, ]
-    a <- a[order(-a[, i]),]
-    new_dat[[i]] <- a
+sort_dat_de <- function(dat) {
+  if (all(apply(dat, 2, is.numeric))) {
+    maxindex <- apply(dat, 1, which.max)
+    new_dat <- list()
+    for (i in sort(maxindex)) {
+      a <- dat[maxindex == i, ]
+      a <- a[order(-a[, i]),]
+      new_dat[[i]] <- a
+    }
+    new_dat <- do.call(rbind, new_dat)
+    return(new_dat)
+  } else {
+    stop("dat must be numeric!")
   }
-  new_dat <- do.call(rbind, new_dat)
-  return(new_dat)
 }
 
 
 
-#' Sort data.frame (decrease)
+#' Sort data.frame (increase)
 #'
 #' Sort rows of dataframe according row minimal value coordinate.
 #'
 #' @param dat data.frame, numeric.
-sort_dat_de <- function(dat) {
-  minindex <- apply(dat, 1, which.min)
-  new_dat <- list()
-  for (i in sort(minindex)) {
-    a <- dat[minindex == i, ]
-    a <- a[order(a[, i]),]
-    new_dat[[i]] <- a
+sort_dat_in <- function(dat) {
+  if (all(apply(dat, 2, is.numeric))) {
+    minindex <- apply(dat, 1, which.min)
+    new_dat <- list()
+    for (i in sort(minindex)) {
+      a <- dat[minindex == i, ]
+      a <- a[order(a[, i]),]
+      new_dat[[i]] <- a
+    }
+    new_dat <- do.call(rbind, new_dat)
+    return(new_dat)
+  } else {
+    stop("dat must be numeric!")
   }
-  new_dat <- do.call(rbind, new_dat)
-  return(new_dat)
 }
 
 
