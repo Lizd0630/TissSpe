@@ -134,7 +134,7 @@ plot_heatmap <- function(lst,
                          specificity = c(0.8, 1),
                          ts_method = "Tau",
                          Ib = 1,
-                         angle_col = "45",
+                         angle_col = 45,
                          cluster_cols = FALSE,
                          cluster_rows = FALSE,
                          show_rownames = FALSE,
@@ -169,7 +169,7 @@ plot_heatmap <- function(lst,
       } else {
         stop("specificity must be numeric vector and range from 0 to 1!")
       }
-  } else if (dat_type == "bin") {
+    } else if (dat_type == "bin") {
       df <- lst$bin
       tissue_num <- ncol(df) - 2
       if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
@@ -191,34 +191,34 @@ plot_heatmap <- function(lst,
       } else {
           stop("Ib must be integer and range from 1 to tissue numbers!")
       }
-    } else if (length(dat_type) == 2) {
-      if (all((dat_type %in% c("bin", "raw")))) {
-        df1<- lst$raw
-        df2 <- lst$bin
-        tissue_num <- ncol(df2) - 2
-        if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
-          df2plot <- df1[which(df2$Ib == Ib), 1:tissue_num]
-          if (Ib < tissue_num/2) {
-            df2plot <- sort_dat_de(df2plot)
-          } else {
-            df2plot <- sort_dat_in(df2plot)
-          }
-          main = paste("Ib =", Ib, "and nrow =", nrow(df2plot))
-          pheatmap(mat = df2plot,
-                   ...,
-                   angle_col = angle_col,
-                   cluster_cols = cluster_cols,
-                   cluster_rows = cluster_rows,
-                   show_rownames = show_rownames,
-                   color = color,
-                   main = main)
-        } else {
-          stop("Ib must be integer and range from 1 to tissue numbers!")
-        }
-      }
-    } else {
-      stop("dat_type must be one of 'raw', 'bin' or c('raw', 'bin')!")
     }
+  } else if (length(dat_type) == 2) {
+    if (all(dat_type %in% c("bin", "raw"))) {
+      df1 <- lst$raw
+      df2 <- lst$bin
+      tissue_num <- ncol(df2) - 2
+      if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
+        df2plot <- df1[which(df2$Ib == Ib), 1:tissue_num]
+        if (Ib < tissue_num/2) {
+          df2plot <- sort_dat_de(df2plot)
+        } else {
+          df2plot <- sort_dat_in(df2plot)
+        }
+        main = paste("Ib =", Ib, "and nrow =", nrow(df2plot))
+        pheatmap(mat = df2plot,
+                 ...,
+                 angle_col = angle_col,
+                 cluster_cols = cluster_cols,
+                 cluster_rows = cluster_rows,
+                 show_rownames = show_rownames,
+                 color = color,
+                 main = main)
+      } else {
+        stop("Ib must be integer and range from 1 to tissue numbers!")
+      }
+    }
+  } else {
+    stop("dat_type must be one of 'raw', 'bin' or c('raw', 'bin')!")
   }
 }
 
