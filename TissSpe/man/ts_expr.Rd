@@ -27,7 +27,7 @@ expression values. Default 10.}
 \item{step}{Numeric. Width of intervals in \code{binary} "seq" method. Be
 careful when used with \code{trans}.}
 
-\item{trans}{Charactor. one of "log2", "log2_QN", "QN". "QN" means
+\item{trans}{Charactor. one of "log2", "log2_QN", "QN", "none". "QN" means
 \code{quantile.normolize}.}
 
 \item{tissues}{Vector of charactors, at leat length of 2. Analysed Tissues'
@@ -51,7 +51,11 @@ their specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee",
 and index binary "Ib"(named "bin").
 }
 \description{
-Function to find tissue-specific gene expression for a given data.frame.
+Function to find tissue-specific gene expression for a given data.frame. For
+equal-density-intervals (\code{binary} = "quant"), parameters: \code{df,
+binary, n, min, max, tissues, identifier} must be specified. However, for
+equal-width-intervals (\code{binary} = "seq"), parameters: \code{df, binary,
+n, min, step, tissues, identifier} must be specified.
 }
 \details{
 Function to detect tissue specific gene, and return a list with 2

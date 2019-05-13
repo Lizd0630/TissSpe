@@ -5,9 +5,8 @@
 \title{Heatmap for subset specific-expression}
 \usage{
 plot_heatmap(lst, dat_type = "raw", specificity = c(0.8, 1),
-  ts_method = "Tau", Ib = 1, angle_col = "45",
-  cluster_cols = FALSE, cluster_rows = FALSE, show_rownames = FALSE,
-  ...)
+  ts_method = "Tau", Ib = 1, angle_col = 45, cluster_cols = FALSE,
+  cluster_rows = FALSE, show_rownames = FALSE, ...)
 }
 \arguments{
 \item{lst}{List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.}

@@ -6,8 +6,7 @@
 #'
 #' @param x Vector, numeric.
 expr_mean <- function(x) {
-  if(!all(is.na(x)))
-  {
+  if(!all(is.na(x))) {
     res <- mean(x, na.rm = T)
   } else {
     res <- NA
@@ -23,10 +22,8 @@ expr_mean <- function(x) {
 #' Max is calculated taking in account tissues with 0 expression: 2+0+4=4.
 #'
 #' @param x numeric.
-expr_max <- function(x)
-{
-  if(!all(is.na(x)))
-  {
+expr_max <- function(x) {
+  if(!all(is.na(x))) {
     res <- max(x, na.rm = T)
   } else {
     res <- NA

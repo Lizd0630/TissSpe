@@ -12,18 +12,19 @@
 #' @return data.frame with original value with specificity index of 9 methhods.
 ts_index <- function(df,
                      cutoff = 1) {
-  df$Tau <- apply(df, 1, ts_Tau)
-  df$Gini <- apply(df, 1, ts_Gini)
-  df$Tsi <- apply(df, 1, ts_Tsi)
-  df$Counts <- apply(df, 1, function(x) {x <- ts_Counts(x, cutoff)})
-  df$Hg <- apply(df, 1, ts_Hg)
-  df$Zscore <- ts_Z(df)
-  df$Spm <- apply(df, 1, ts_Spm)
-  df$Ee <- ts_Ee(df)
-  df$Pem <- ts_Pem(df)
+  len <- 1:length(colnames(df))
+  df$Tau <- apply(df[, len], 1, ts_Tau)
+  df$Gini <- apply(df[, len], 1, ts_Gini)
+  df$Tsi <- apply(df[, len], 1, ts_Tsi)
+  df$Counts <- apply(df[, len], 1, function(x) {x <- ts_Counts(x, cutoff)})
+  df$Hg <- apply(df[, len], 1, ts_Hg)
+  df$Zscore <- ts_Z(df[, len])
+  df$Spm <- apply(df[, len], 1, ts_Spm)
+  df$Ee <- ts_Ee(df[, len])
+  df$Pem <- ts_Pem(df[, len])
 
-  df$Mean <- apply(df, 1, expr_mean)
-  df$Max <- apply(df, 1, expr_max)
+  df$Mean <- apply(df[, len], 1, expr_mean)
+  df$Max <- apply(df[, len], 1, expr_max)
   return(df)
 }
 
@@ -106,6 +107,9 @@ ts_psi <- function(df,
   ## format data.frame
   if (is.vector(tissues) & length(tissues) >= 2) {
     df <- fmt_df(df = df, tissues = tissues, identifier = identifier)
+    if (max(df) <= 1) {
+      stop("Vaules of psi should convert into 0-100!")
+    }
   } else {
     stop("tissues must be a vector with length at least 2!")
   }
@@ -118,27 +122,14 @@ ts_psi <- function(df,
     df <- na.omit(df)
   }
 
-  #df <- rep_mean(df = df, tissues = tissues)
-
   ## binary type
   df_list <- list(raw = df, bin = psi_seq_rank(df = df, n = n, min = min, max = max))
-#  if (binary == "seq") {
-#    df_list <- list(raw = df, bin = seq_rank(df = df, n = n, min = min, max = max))
-#  } else if (binary == "quant") {
-#    df_list <- list(raw = df, bin = quant_rank(df = df, n = n, min = min, max = max))
-#  } else {
-#    stop("binary type error!")
-#  }
 
   ## calculate tissue specificity
   df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
-  #df_list[[2]] <- ts_index(df_list[[2]], cutoff = cutoff)
   df_list[[2]] <- ts_bin(df_list[[2]], mingap = mingap)
   return(df_list)
 }
-
-
-
 
 
 
@@ -147,7 +138,11 @@ ts_psi <- function(df,
 #############################
 #' Calculate specificity for gene expression
 #'
-#' Function to find tissue-specific gene expression for a given data.frame.
+#' Function to find tissue-specific gene expression for a given data.frame. For
+#' equal-density-intervals (\code{binary} = "quant"), parameters: \code{df,
+#' binary, n, min, max, tissues, identifier} must be specified. However, for
+#' equal-width-intervals (\code{binary} = "seq"), parameters: \code{df, binary,
+#' n, min, step, tissues, identifier} must be specified.
 #'
 #' Function to detect tissue specific gene, and return a list with 2
 #' data.frames, which contain raw values and binary pattern values and their
@@ -169,7 +164,7 @@ ts_psi <- function(df,
 #' \code{n+1}(highest). Default 16.
 #' @param step Numeric. Width of intervals in \code{binary} "seq" method. Be
 #' careful when used with \code{trans}.
-#' @param trans Charactor. one of "log2", "log2_QN", "QN". "QN" means
+#' @param trans Charactor. one of "log2", "log2_QN", "QN", "none". "QN" means
 #' \code{quantile.normolize}.
 #' @param tissues Vector of charactors, at leat length of 2. Analysed Tissues'
 #' unique identifiers, and must exactly keep away from "Tau", "Gini", "Tsi",
@@ -230,12 +225,11 @@ ts_expr <- function(df,
   } else if (trans == "QN") {
     df[df < cutoff] <- 0
     df <- quant_norm(df)
-  } else {
+  } else if (trans == "none") {
     df  <- df
+  } else {
+    stop("Value of trans error!")
   }
-
-  ## calculate mean of replicates
-  #df <- rep_mean(df = df, tissues = tissues)
 
   ## binary type
   if (binary == "seq") {
@@ -248,7 +242,6 @@ ts_expr <- function(df,
 
   ## calculate tissue specificity
   df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
-  #df_list[[2]] <- ts_index(df_list[[2]], cutoff = cutoff)
   df_list[[2]] <- ts_bin(df_list[[2]], mingap = mingap)
   return(df_list)
 }
