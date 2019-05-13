@@ -8,7 +8,7 @@ ts_psi(df, n = 10, min = 0, max = 100, tissues, identifier,
   na.del = TRUE, cutoff = 1, mingap = 3)
 }
 \arguments{
-\item{df}{data.frame, which contain psi vaules. One column is the names of
+\item{df}{data.frame, which contain psi vaules (0-100). One column is the names of
 symbols, like AS events id, etc.}
 
 \item{n}{Integer. \code{n+2} equal-width-intervals be generated of all psi
@@ -54,7 +54,7 @@ all values betwwen min and max in the data.frame will be graded into n
 equal-width-intervals and then assign the rank 0(unexpressed) to \code{n+1}.
 }
 \examples{
-ts_psi(tmp_psi,
+ts_psi(demo_psi,
        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
                    "sample_E", "sample_F", "sample_G", "sample_H",
                    "sample_I", "sample_J", "sample_K", "sample_L",

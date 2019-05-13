@@ -63,7 +63,7 @@ graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
 and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 }
 \examples{
-ts_psi(tmp_tpm,
+ts_psi(demo_tpm,
        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
                    "sample_E", "sample_F", "sample_G", "sample_H",
                    "sample_I", "sample_J", "sample_K", "sample_L",

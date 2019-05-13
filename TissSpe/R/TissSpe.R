@@ -1,7 +1,8 @@
 #' TissSpe: A package for calculating specificity.
 #'
 #' The \code{TissSpe} package provides 4 functions: \code{ts_psi},
-#' \code{ts_expr}, \code{plot_density} and \code{plot_heatmap}.
+#' \code{ts_expr}, \code{plot_density} and \code{plot_heatmap}, and 2 datasets:
+#' \code{demo_psi}, \code{demo_tpm}.
 #'
 #' @section Functions:
 #' \describe{
@@ -9,6 +10,12 @@
 #'   \item{ts_expr}{caculate specificity of gene expression.}
 #'   \item{plot_density}{plot density of results from \code{ts_psi} or \code{ts_expr}.}
 #'   \item{plot_heatmap}{heatmap of sub-results from \code{ts_psi} or \code{ts_expr}.}
+#' }
+#'
+#' @section Datasets:
+#' \describe{
+#'   \item{demo_psi}{A psi demo of AS events in 17 tissues with 2 replicates.}
+#'   \item{demo_tpm}{A gene expression demo of TPM in 16 tissues with 2 replicates.}
 #' }
 #'
 #' @docType package

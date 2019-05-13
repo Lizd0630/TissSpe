@@ -61,7 +61,7 @@ ts_bin <- function(df,
 #' all values betwwen min and max in the data.frame will be graded into n
 #' equal-width-intervals and then assign the rank 0(unexpressed) to \code{n+1}.
 #'
-#' @param df data.frame, which contain psi vaules. One column is the names of
+#' @param df data.frame, which contain psi vaules (0-100). One column is the names of
 #' symbols, like AS events id, etc.
 #' @param n Integer. \code{n+2} equal-width-intervals be generated of all psi
 #' values. Default 10.
@@ -87,7 +87,7 @@ ts_bin <- function(df,
 #' index binary "Ib"(named "bin").
 #' @export
 #' @examples
-#' ts_psi(tmp_psi,
+#' ts_psi(demo_psi,
 #'        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
 #'                    "sample_E", "sample_F", "sample_G", "sample_H",
 #'                    "sample_I", "sample_J", "sample_K", "sample_L",
@@ -110,12 +110,15 @@ ts_psi <- function(df,
     stop("tissues must be a vector with length at least 2!")
   }
 
+  ## calculate mean of replicates
+  df <- rep_mean(df = df, tissues = tissues)
+
   ## wheather remove NA
   if (na.del == TRUE) {
     df <- na.omit(df)
   }
 
-  df <- rep_mean(df = df, tissues = tissues)
+  #df <- rep_mean(df = df, tissues = tissues)
 
   ## binary type
   df_list <- list(raw = df, bin = psi_seq_rank(df = df, n = n, min = min, max = max))
@@ -183,7 +186,7 @@ ts_psi <- function(df,
 #' and index binary "Ib"(named "bin").
 #' @export
 #' @examples
-#' ts_psi(tmp_tpm,
+#' ts_psi(demo_tpm,
 #'        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
 #'                    "sample_E", "sample_F", "sample_G", "sample_H",
 #'                    "sample_I", "sample_J", "sample_K", "sample_L",
@@ -208,6 +211,9 @@ ts_expr <- function(df,
     stop("tissues must be a vector with length at least 2!")
   }
 
+  ## calculate mean of replicates
+  df <- rep_mean(df = df, tissues = tissues)
+
   ## wheather remove NA
   if (na.del == TRUE) {
     df <- na.omit(df)
@@ -229,7 +235,7 @@ ts_expr <- function(df,
   }
 
   ## calculate mean of replicates
-  df <- rep_mean(df = df, tissues = tissues)
+  #df <- rep_mean(df = df, tissues = tissues)
 
   ## binary type
   if (binary == "seq") {

@@ -10,7 +10,7 @@
 #'   \item{sample_A_2}{sample_A, replicate 2}
 #'   ...
 #' }
-"tmp_psi"
+"demo_psi"
 
 #' A gene expression demo of TPM in 16 tissues
 #'
@@ -23,4 +23,4 @@
 #'   \item{sample_A_2}{sample_A, replicate 2}
 #'   ...
 #' }
-"tmp_tpm"
+"demo_tpm"

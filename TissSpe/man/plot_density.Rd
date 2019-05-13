@@ -21,7 +21,7 @@ refers to paper, please!
 }
 \examples{
 \dontrun{
-result <- ts_psi(tmp_psi,
+result <- ts_psi(demo_psi,
                  tissues = c("sample_A", "sample_B", "sample_C",
                              "sample_D", "sample_E", "sample_F",
                              "sample_G", "sample_H", "sample_I",

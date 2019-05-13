@@ -5,14 +5,17 @@
 \title{Heatmap for subset specific-expression}
 \usage{
 plot_heatmap(lst, dat_type = "raw", specificity = c(0.8, 1),
-  ts_method = "Tau", Ib = 1, ...)
+  ts_method = "Tau", Ib = 1, angle_col = "45",
+  cluster_cols = FALSE, cluster_rows = FALSE, show_rownames = FALSE,
+  ...)
 }
 \arguments{
 \item{lst}{List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.}
 
-\item{dat_type}{"raw" or "bin". Plot "raw"(psi/FPKM/RPKM/TPM) or
+\item{dat_type}{"raw", "bin" or c('raw', 'bin'). Plot "raw"(psi/FPKM/RPKM/TPM) or
 "bin"(binary index). Default "raw". "raw" work with \code{specificity}, and
-"bin" work with \code{Ib}.}
+"bin" work with \code{Ib}. If specify c('raw', 'bin'), then plot the heatmap of
+raw value(psi or tpm) of Ib.}
 
 \item{specificity}{Vector of range, numeric. Region of specificity to plot,
 work with \code{dat_type}="raw". Default \code{c(0.8, 1)}.}
@@ -22,6 +25,14 @@ work with \code{dat_type}="raw". Default \code{c(0.8, 1)}.}
 
 \item{Ib}{Integer. Cutoff of binary index, work with \code{dat_type}="bin".}
 
+\item{angle_col}{refer to the same parameter in \code{pheatmap}.}
+
+\item{cluster_cols}{refer to the same parameter in \code{pheatmap}.}
+
+\item{cluster_rows}{refer to the same parameter in \code{pheatmap}.}
+
+\item{show_rownames}{refer to the same parameter in \code{pheatmap}.}
+
 \item{...}{parameters of \code{pheatmap} pkg.}
 }
 \description{
@@ -30,7 +41,7 @@ Wrapper function derived from \code{pheatmap}. Use the results of
 better for yourwork sometimes.
 }
 \examples{
-result <- ts_psi(tmp_psi,
+result <- ts_psi(demo_psi,
                  tissues = c("sample_A", "sample_B", "sample_C",
                              "sample_D", "sample_E", "sample_F",
                              "sample_G", "sample_H", "sample_I",

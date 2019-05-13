@@ -73,7 +73,11 @@ rep_mean <- function(df,
   colnames(mat) <- tissues
   rownames(mat) <- rownames(df)
   for (i in tissues) {
-    mat[, i] <- rowMeans(df[,regexpr(paste0("^", i), colnames(df)) > 0],
+    tissue <- (regexpr(paste0("^", i), colnames(df)) > 0)
+    if (!any(tissue)) {
+      stop(paste0("'", i, "'", " may not in your data! Please check!"))
+    }
+    mat[, i] <- rowMeans(as.data.frame(df[, tissue]),
                          na.rm = TRUE,
                          dims = 1)
   }
@@ -96,7 +100,9 @@ quant_norm <- function(df) {
   mat <- as.matrix(df)
   mat <- normalize.quantiles(mat)
   mat[is.na(mat)] <- 0
-  return(data.frame(mat))
+  colnames(mat) <- colnames(df)
+  rownames(mat) <- rownames(df)
+  return(as.data.frame(mat))
 }
 
 
