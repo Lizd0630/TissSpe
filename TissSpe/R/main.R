@@ -139,10 +139,12 @@ ts_psi <- function(df,
 #' Calculate specificity for gene expression
 #'
 #' Function to find tissue-specific gene expression for a given data.frame. For
-#' equal-density-intervals (\code{binary} = "quant"), parameters: \code{df,
-#' binary, n, min, max, tissues, identifier} must be specified. However, for
-#' equal-width-intervals (\code{binary} = "seq"), parameters: \code{df, binary,
-#' n, min, step, tissues, identifier} must be specified.
+#' equal-density-intervals (\code{binary = "quant"}), parameters: \code{df,
+#' binary, n, min, max, tissues, identifier} must be specified, and the used
+#' values are in the range \code{(min, max)}. However, for
+#' equal-width-intervals (\code{binary = "seq"}), parameters: \code{df, binary,
+#' n, min, step, tissues, identifier} must be specified, and the used values
+#' are in the range \code{(min,  min+step*n)}.
 #'
 #' Function to detect tissue specific gene, and return a list with 2
 #' data.frames, which contain raw values and binary pattern values and their
@@ -181,7 +183,7 @@ ts_psi <- function(df,
 #' and index binary "Ib"(named "bin").
 #' @export
 #' @examples
-#' ts_psi(demo_tpm,
+#' ts_expr(demo_tpm,
 #'        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
 #'                    "sample_E", "sample_F", "sample_G", "sample_H",
 #'                    "sample_I", "sample_J", "sample_K", "sample_L",

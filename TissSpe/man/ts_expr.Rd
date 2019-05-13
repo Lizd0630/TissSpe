@@ -52,10 +52,12 @@ and index binary "Ib"(named "bin").
 }
 \description{
 Function to find tissue-specific gene expression for a given data.frame. For
-equal-density-intervals (\code{binary} = "quant"), parameters: \code{df,
-binary, n, min, max, tissues, identifier} must be specified. However, for
-equal-width-intervals (\code{binary} = "seq"), parameters: \code{df, binary,
-n, min, step, tissues, identifier} must be specified.
+equal-density-intervals (\code{binary = "quant"}), parameters: \code{df,
+binary, n, min, max, tissues, identifier} must be specified, and the used
+values are in the range \code{(min, max)}. However, for
+equal-width-intervals (\code{binary = "seq"}), parameters: \code{df, binary,
+n, min, step, tissues, identifier} must be specified, and the used values
+are in the range \code{(min,  min+step*n)}.
 }
 \details{
 Function to detect tissue specific gene, and return a list with 2
@@ -67,7 +69,7 @@ graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
 and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 }
 \examples{
-ts_psi(demo_tpm,
+ts_expr(demo_tpm,
        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
                    "sample_E", "sample_F", "sample_G", "sample_H",
                    "sample_I", "sample_J", "sample_K", "sample_L",
