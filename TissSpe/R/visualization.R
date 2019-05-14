@@ -6,9 +6,10 @@
 #' Plot density curves of 9 methods. Transformation methods in this function,
 #' refers to paper, please!
 #'
-#' @param lst List of two data.frame. one of them contains psi values with their
+#' @param lst List of 3 data.frame. one of them contains psi values with their
 #' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-#' "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+#' "Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+#' index(named "rank"), the third contains binary pattern values and
 #' index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
 #' \code{ts_expr}.
 #' @param ymax Numeric. maximum of y limitation. Default 12.
@@ -99,16 +100,21 @@ plot_density <- function(lst,
 #' \code{ts_expr} or \code{ts_psi} as Input. Using pheatmap youself may be
 #' better for yourwork sometimes.
 #'
-#' @param lst List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.
-#' @param dat_type "raw", "bin" or c('raw', 'bin'). Plot "raw"(psi/FPKM/RPKM/TPM) or
-#' "bin"(binary index). Default "raw". "raw" work with \code{specificity}, and
-#' "bin" work with \code{Ib}. If specify c('raw', 'bin'), then plot the heatmap of
+#' @param lst List of 3 data.frame. one of them contains psi values with their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+#' index(named "rank"), the third contains binary pattern values and
+#' index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
+#' \code{ts_expr}.
+#' @param dat_type "raw", "rank" or c('raw', 'rank'). Plot "raw"(psi/FPKM/RPKM/TPM) or
+#' "rank"(0-n+1). Default "raw". "raw" work with \code{specificity}, and
+#' "rank" work with \code{Ib}. If specify c('raw', 'rank'), then plot the heatmap of
 #' raw value(psi or tpm) of Ib.
 #' @param specificity Vector of range, numeric. Region of specificity to plot,
 #' work with \code{dat_type}="raw". Default \code{c(0.8, 1)}.
 #' @param ts_method Specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
 #' "Hg", "Zscore", "Spm" or "Pem".
-#' @param Ib Integer. Cutoff of binary index, work with \code{dat_type}="bin".
+#' @param Ib Integer. Cutoff of binary index, work with \code{dat_type}="rank".
 #' @param angle_col refer to the same parameter in \code{pheatmap}.
 #' @param cluster_cols refer to the same parameter in \code{pheatmap}.
 #' @param cluster_rows refer to the same parameter in \code{pheatmap}.
@@ -128,7 +134,7 @@ plot_density <- function(lst,
 #'                              "sample_P", "sample_Q"),
 #'                              identifier = "AS_events")
 #' plot_heatmap(result)
-#' plot_heatmap(result, dat_type = "bin", Ib = 2)
+#' plot_heatmap(result, dat_type = "rank", Ib = 2)
 plot_heatmap <- function(lst,
                          dat_type = "raw",
                          specificity = c(0.8, 1),
@@ -169,8 +175,8 @@ plot_heatmap <- function(lst,
       } else {
         stop("specificity must be numeric vector and range from 0 to 1!")
       }
-    } else if (dat_type == "bin") {
-      df <- lst$bin
+    } else if (dat_type == "rank") {
+      df <- lst$rank
       tissue_num <- ncol(df) - 2
       if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
         df2plot <- df[which(df$Ib == Ib), 1:tissue_num]
@@ -193,9 +199,9 @@ plot_heatmap <- function(lst,
       }
     }
   } else if (length(dat_type) == 2) {
-    if (all(dat_type %in% c("bin", "raw"))) {
+    if (all(dat_type %in% c("rank", "raw"))) {
       df1 <- lst$raw
-      df2 <- lst$bin
+      df2 <- lst$rank
       tissue_num <- ncol(df2) - 2
       if (is.numeric(Ib) & (Ib > 0) & (Ib < tissue_num)) {
         df2plot <- df1[which(df2$Ib == Ib), 1:tissue_num]
@@ -218,7 +224,7 @@ plot_heatmap <- function(lst,
       }
     }
   } else {
-    stop("dat_type must be one of 'raw', 'bin' or c('raw', 'bin')!")
+    stop("dat_type must be one of 'raw', 'rank' or c('raw', 'rank')!")
   }
 }
 

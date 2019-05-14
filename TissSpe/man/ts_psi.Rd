@@ -5,7 +5,7 @@
 \title{Calculate specificity of psi}
 \usage{
 ts_psi(df, n = 10, min = 0, max = 100, tissues, identifier,
-  na.del = TRUE, cutoff = 1, mingap = 3)
+  na.del = TRUE, cutoff = 0.5, mingap = 3)
 }
 \arguments{
 \item{df}{data.frame, which contain psi vaules (0-100). One column is the names of
@@ -37,9 +37,10 @@ in Specificity method "Counts".}
 refer the paper. Default 3.}
 }
 \value{
-List of two data.frame. one of them contains psi values with their
+List of 3 data.frame. one of them contains psi values with their
 specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+index(named "rank"), the third contains binary pattern values and
 index binary "Ib"(named "bin").
 }
 \description{

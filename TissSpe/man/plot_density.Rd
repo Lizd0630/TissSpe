@@ -7,9 +7,10 @@
 plot_density(lst, ymax = 12)
 }
 \arguments{
-\item{lst}{List of two data.frame. one of them contains psi values with their
+\item{lst}{List of 3 data.frame. one of them contains psi values with their
 specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+index(named "rank"), the third contains binary pattern values and
 index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
 \code{ts_expr}.}
 

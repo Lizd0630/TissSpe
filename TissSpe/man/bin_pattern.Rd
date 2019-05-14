@@ -12,9 +12,9 @@ bin_pattern(x, mingap = 3)
 \item{mingap}{minimal gap to generate binary pattern.}
 }
 \value{
-binary pattern, which can be classified into "DE"(differential
-exprresion, with mingap) or "UC"(unclear, ) or "HK"(house keeping, all in
-the same rank).
+binary pattern, which can be classified into "DE"(Differential
+exprresion, with mingap) or "UC"(Unclear, without mingap and have different
+rank) or "HK"(House keeping, all in the same rank).
 }
 \description{
 Function to generate binary pattern(0/1) of ranked data. Define gaps as the

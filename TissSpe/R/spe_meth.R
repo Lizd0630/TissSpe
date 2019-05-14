@@ -1,6 +1,35 @@
 #######################
 # specificity methods #
 #######################
+#' Calculate specificity for a given numeric data.frame
+#'
+#' Function to calculate specificity for a given numeric data.frame and return
+#' a data.frame with original value with specificity index of 9 methhods.
+#'
+#' @param df data.frame of numeric.
+#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
+#' Specificity method Counts.
+#' @return data.frame with original value with specificity index of 9 methhods.
+ts_index <- function(df,
+                     cutoff = 1) {
+  len <- 1:ncol(df)
+  df$Tau <- apply(df[, len], 1, ts_Tau)
+  df$Gini <- apply(df[, len], 1, ts_Gini)
+  df$Tsi <- apply(df[, len], 1, ts_Tsi)
+  df$Counts <- apply(df[, len], 1, function(x) {x <- ts_Counts(x, cutoff)})
+  df$Hg <- apply(df[, len], 1, ts_Hg)
+  df$Zscore <- ts_Z(df[, len])
+  df$Spm <- apply(df[, len], 1, ts_Spm)
+  df$Ee <- ts_Ee(df[, len])
+  df$Pem <- ts_Pem(df[, len])
+
+  df$Mean <- apply(df[, len], 1, expr_mean)
+  df$Max <- apply(df[, len], 1, expr_max)
+  return(df)
+}
+
+
+
 # N is the number of tissues in the data set, n is the number of tissues
 # expressed; X is the maximal specificity value for a certain gene among all
 # tissues, maxX is maximal values.

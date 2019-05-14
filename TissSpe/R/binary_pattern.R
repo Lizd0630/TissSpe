@@ -1,3 +1,24 @@
+############################
+# binary pattern and index #
+############################
+#' Calculate binary index for a given ranks data.frame
+#'
+#' Function to calculate binary index(0/1) for a given ranks data.frame and
+#' return a data.frame with ranks with binary index and phenotype("DE" or "UC").
+#'
+#' @param df data.frame of ranks.
+#' @param mingap integer. Minimal gap to generate binary pattern. Default 3.
+#' @return data.frame with ranks with binary index and phenotype("DE" or "UC").
+ts_ib <- function(df,
+                  mingap = 3) {
+  res <- t(apply(df, 1, function(x) {bin_index(x, mingap = mingap)}))
+  df$Ib <- as.integer(res[, 1])
+  df$Type <- res[, 2]
+  return(df)
+}
+
+
+
 #' Ranking psi according to equal-width-intervals
 #'
 #' Function to cut data.frame range into n equal-width interval points, maximal
@@ -73,6 +94,7 @@ expr_seq_rank <- function(df,
   if (min < df_min | max > df_max) {
     stop(paste0("Range of expression is ", df_min, "-", df_max, "! Please check parameters!"))
   } else {
+    warning(paste0("Range of expression is ", df_min, "-", df_max, "! Be careful!"))
     bks <- seq(min, max, step)
     # bks <- quantile(min:max, probs = seq(0, 1, 1/(n-1)))
   }
@@ -208,11 +230,11 @@ bin_index <- function(x,
 #'
 #' @param x integer vector, Ranks.
 #' @param mingap minimal gap to generate binary pattern.
-#' @return binary pattern, which can be classified into "DE"(differential
-#' exprresion, with mingap) or "UC"(unclear, ) or "HK"(house keeping, all in
-#' the same rank).
+#' @return binary pattern, which can be classified into "DE"(Differential
+#' exprresion, with mingap) or "UC"(Unclear, without mingap and have different
+#' rank) or "HK"(House keeping, all in the same rank).
 bin_pattern <- function(x,
-                      mingap = 3) {
+                        mingap = 3) {
   if (!is.numeric(x)) {
     stop("x must be numeric!")
   }
@@ -231,4 +253,5 @@ bin_pattern <- function(x,
     return(c(rep(0, length(x)), "UC"))
   }
 }
+
 

@@ -9,11 +9,16 @@ plot_heatmap(lst, dat_type = "raw", specificity = c(0.8, 1),
   cluster_rows = FALSE, show_rownames = FALSE, ...)
 }
 \arguments{
-\item{lst}{List of 2 data.frame. Results of \code{ts_expr} or \code{ts_psi}.}
+\item{lst}{List of 3 data.frame. one of them contains psi values with their
+specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+index(named "rank"), the third contains binary pattern values and
+index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
+\code{ts_expr}.}
 
-\item{dat_type}{"raw", "bin" or c('raw', 'bin'). Plot "raw"(psi/FPKM/RPKM/TPM) or
-"bin"(binary index). Default "raw". "raw" work with \code{specificity}, and
-"bin" work with \code{Ib}. If specify c('raw', 'bin'), then plot the heatmap of
+\item{dat_type}{"raw", "rank" or c('raw', 'rank'). Plot "raw"(psi/FPKM/RPKM/TPM) or
+"rank"(0-n+1). Default "raw". "raw" work with \code{specificity}, and
+"rank" work with \code{Ib}. If specify c('raw', 'rank'), then plot the heatmap of
 raw value(psi or tpm) of Ib.}
 
 \item{specificity}{Vector of range, numeric. Region of specificity to plot,
@@ -22,7 +27,7 @@ work with \code{dat_type}="raw". Default \code{c(0.8, 1)}.}
 \item{ts_method}{Specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
 "Hg", "Zscore", "Spm" or "Pem".}
 
-\item{Ib}{Integer. Cutoff of binary index, work with \code{dat_type}="bin".}
+\item{Ib}{Integer. Cutoff of binary index, work with \code{dat_type}="rank".}
 
 \item{angle_col}{refer to the same parameter in \code{pheatmap}.}
 
@@ -49,5 +54,5 @@ result <- ts_psi(demo_psi,
                              "sample_P", "sample_Q"),
                              identifier = "AS_events")
 plot_heatmap(result)
-plot_heatmap(result, dat_type = "bin", Ib = 2)
+plot_heatmap(result, dat_type = "rank", Ib = 2)
 }

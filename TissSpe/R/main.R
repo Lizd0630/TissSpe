@@ -1,56 +1,6 @@
-##############################
-### For caculate specificity
-##############################
-#' Calculate specificity for a given numeric data.frame
-#'
-#' Function to calculate specificity for a given numeric data.frame and return
-#' a data.frame with original value with specificity index of 9 methhods.
-#'
-#' @param df data.frame of numeric.
-#' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
-#' Specificity method Counts.
-#' @return data.frame with original value with specificity index of 9 methhods.
-ts_index <- function(df,
-                     cutoff = 1) {
-  len <- 1:length(colnames(df))
-  df$Tau <- apply(df[, len], 1, ts_Tau)
-  df$Gini <- apply(df[, len], 1, ts_Gini)
-  df$Tsi <- apply(df[, len], 1, ts_Tsi)
-  df$Counts <- apply(df[, len], 1, function(x) {x <- ts_Counts(x, cutoff)})
-  df$Hg <- apply(df[, len], 1, ts_Hg)
-  df$Zscore <- ts_Z(df[, len])
-  df$Spm <- apply(df[, len], 1, ts_Spm)
-  df$Ee <- ts_Ee(df[, len])
-  df$Pem <- ts_Pem(df[, len])
-
-  df$Mean <- apply(df[, len], 1, expr_mean)
-  df$Max <- apply(df[, len], 1, expr_max)
-  return(df)
-}
-
-
-
-#' Calculate binary index for a given ranks data.frame
-#'
-#' Function to calculate binary index(0/1) for a given ranks data.frame and
-#' return a data.frame with ranks with binary index and phenotype("DE" or "UC").
-#'
-#' @param df data.frame of ranks.
-#' @param mingap integer. Minimal gap to generate binary pattern. Default 3.
-#' @return data.frame with ranks with binary index and phenotype("DE" or "UC").
-ts_bin <- function(df,
-                   mingap = 3) {
-  res <- t(apply(df, 1, function(x) {bin_index(x, mingap = mingap)}))
-  df$Ib <- as.integer(res[, 1])
-  df$Type <- res[, 2]
-  return(df)
-}
-
-
-
-##############################
-### For AS events psi
-##############################
+#########################
+### For AS events psi ###
+#########################
 #' Calculate specificity of psi
 #'
 #' Function to find tissue-specific AS-events for a given data.frame.
@@ -82,9 +32,10 @@ ts_bin <- function(df,
 #' @param mingap Integer. Minimal gap of generating binary pattern, Please
 #' refer the paper. Default 3.
 #' @importFrom stats na.omit
-#' @return List of two data.frame. one of them contains psi values with their
+#' @return List of 3 data.frame. one of them contains psi values with their
 #' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-#' "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values and
+#' "Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+#' index(named "rank"), the third contains binary pattern values and
 #' index binary "Ib"(named "bin").
 #' @export
 #' @examples
@@ -102,7 +53,7 @@ ts_psi <- function(df,
                   tissues,
                   identifier,
                   na.del = TRUE,
-                  cutoff = 1,
+                  cutoff = 0.5,
                   mingap = 3) {
   ## format data.frame
   if (is.vector(tissues) & length(tissues) >= 2) {
@@ -122,12 +73,19 @@ ts_psi <- function(df,
     df <- na.omit(df)
   }
 
+  ##
+  if (!is.numeric(cutoff)) {
+    stop("cutoff should be numeric!")
+  }
+
+  df[df < cutoff] <- 0
+
   ## binary type
-  df_list <- list(raw = df, bin = psi_seq_rank(df = df, n = n, min = min, max = max))
+  df_list <- list(raw = df, rank = psi_seq_rank(df = df, n = n, min = min, max = max))
 
   ## calculate tissue specificity
   df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
-  df_list[[2]] <- ts_bin(df_list[[2]], mingap = mingap)
+  df_list[[2]] <- ts_ib(df_list[[2]], mingap = mingap)
   return(df_list)
 }
 
@@ -154,8 +112,8 @@ ts_psi <- function(df,
 #' graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
 #' and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 #'
-#' @param df data.frame, which contain psi vaules. One column is the names of
-#' symbols, like gene id, etc.
+#' @param df data.frame, which contain expression vaules. One column is the names
+#' of symbols, like gene_id, etc.
 #' @param binary "seq" or "quant". Binary-intervals method, "seq" refer to
 #' equal-width-intervals and "quant" refer to equal-density-intervals.
 #' @param n Integer. \code{n+2} "seq" or "quant" intervals be generated of all
@@ -175,15 +133,17 @@ ts_psi <- function(df,
 #' for records, like "gene_id", "AS_events", etc.
 #' @param na.del Logical. Whether NAs will be dropped. Default TRUE.
 #' @param cutoff Numeric. Values under \code{cutoff} will set to 0(unexpressed)
-#' in Specificity method "Counts".
+#' in Specificity method "Counts" and \code{trans="none"}, and values under
+#' \code{log2(cutoff+1)} will set to 0(unexpressed) in log2 transformation.
 #' @param mingap Integer. Minimal gap of generating binary pattern. Default 2.
-#' @return List of two data.frame. one of them contains expression values with
-#' their specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee",
-#' "Pem", "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values
-#' and index binary "Ib"(named "bin").
+#' @return List of 3 data.frame. one of them contains psi values with their
+#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+#' "Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+#' index(named "rank"), the third contains binary pattern values and
+#' index binary "Ib"(named "bin").
 #' @export
 #' @examples
-#' ts_expr(demo_tpm,
+#' ts_expr(demo_tpm, n = 11,
 #'        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
 #'                    "sample_E", "sample_F", "sample_G", "sample_H",
 #'                    "sample_I", "sample_J", "sample_K", "sample_L",
@@ -216,35 +176,40 @@ ts_expr <- function(df,
     df <- na.omit(df)
   }
 
+  ##
+  if (!is.numeric(cutoff)) {
+    stop("cutoff should be numeric!")
+  }
+
   if (trans == "log2_QN") {
-    df[df < cutoff] <- 1
-    df <- quant_norm(log2(df))
-    cutoff <- log2(cutoff)
+    df <- quant_norm(log2(df + 1))
+    cutoff <- log2(cutoff + 1)
+    df[df < cutoff] <- 0
   } else if (trans == "log2") {
-    df[df < cutoff] <- 1
-    df <- log2(df)
-    cutoff <- log2(cutoff)
+    df <- log2(df + 1)
+    cutoff <- log2(cutoff + 1)
+    df[df < cutoff] <- 0
   } else if (trans == "QN") {
     df[df < cutoff] <- 0
     df <- quant_norm(df)
   } else if (trans == "none") {
-    df  <- df
+    df[df < cutoff] <- 0
   } else {
     stop("Value of trans error!")
   }
 
   ## binary type
   if (binary == "seq") {
-    df_list <- list(raw = df, bin = expr_seq_rank(df = df, n = n, min = min, step = step))
+    df_list <- list(raw = df, rank = expr_seq_rank(df = df, n = n, min = min, step = step))
   } else if (binary == "quant") {
-    df_list <- list(raw = df, bin = expr_quant_rank(df = df, n = n, min = min, max = max))
+    df_list <- list(raw = df, rank = expr_quant_rank(df = df, n = n, min = min, max = max))
   } else {
     stop("binary type error!")
   }
 
   ## calculate tissue specificity
   df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
-  df_list[[2]] <- ts_bin(df_list[[2]], mingap = mingap)
+  df_list[[2]] <- ts_ib(df_list[[2]], mingap = mingap)
   return(df_list)
 }
 

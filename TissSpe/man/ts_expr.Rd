@@ -9,8 +9,8 @@ ts_expr(df, binary = "seq", n = 12, min = 0, max = 16, step = 1,
   mingap = 2)
 }
 \arguments{
-\item{df}{data.frame, which contain psi vaules. One column is the names of
-symbols, like gene id, etc.}
+\item{df}{data.frame, which contain expression vaules. One column is the names
+of symbols, like gene_id, etc.}
 
 \item{binary}{"seq" or "quant". Binary-intervals method, "seq" refer to
 equal-width-intervals and "quant" refer to equal-density-intervals.}
@@ -40,15 +40,17 @@ for records, like "gene_id", "AS_events", etc.}
 \item{na.del}{Logical. Whether NAs will be dropped. Default TRUE.}
 
 \item{cutoff}{Numeric. Values under \code{cutoff} will set to 0(unexpressed)
-in Specificity method "Counts".}
+in Specificity method "Counts" and \code{trans="none"}, and values under
+\code{log2(cutoff+1)} will set to 0(unexpressed) in log2 transformation.}
 
 \item{mingap}{Integer. Minimal gap of generating binary pattern. Default 2.}
 }
 \value{
-List of two data.frame. one of them contains expression values with
-their specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee",
-"Pem", "Hg", "Z", "Spm"(named "raw"), the other contains binary pattern values
-and index binary "Ib"(named "bin").
+List of 3 data.frame. one of them contains psi values with their
+specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
+"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
+index(named "rank"), the third contains binary pattern values and
+index binary "Ib"(named "bin").
 }
 \description{
 Function to find tissue-specific gene expression for a given data.frame. For
@@ -69,7 +71,7 @@ graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
 and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 }
 \examples{
-ts_expr(demo_tpm,
+ts_expr(demo_tpm, n = 11,
        tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
                    "sample_E", "sample_F", "sample_G", "sample_H",
                    "sample_I", "sample_J", "sample_K", "sample_L",
