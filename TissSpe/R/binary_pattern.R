@@ -9,12 +9,98 @@
 #' @param df data.frame of ranks.
 #' @param mingap integer. Minimal gap to generate binary pattern. Default 3.
 #' @return data.frame with ranks with binary index and phenotype("DE" or "UC").
-ts_ib <- function(df,
+ts_pattern <- function(df,
                   mingap = 3) {
-  res <- t(apply(df, 1, function(x) {bin_index(x, mingap = mingap)}))
-  df$Ib <- as.integer(res[, 1])
-  df$Type <- res[, 2]
-  return(df)
+
+  res <- as.data.frame(t(apply(df, 1, function(x) {
+                               bin_pattern(x, mingap = mingap)
+                               })))
+  colnames(res) <- c(colnames(df), "Ib", "Type")
+  rownames(res) <- rownames(df)
+  for (i in 1:(ncol(res) - 1)) {
+    res[, i] <- as.integer(as.vector(res[, i]))
+  }
+  return(res)
+}
+
+
+
+#' binary index
+#'
+#' Function to generate binary index(the sum of \code{binary pattern}) of
+#' ranked data. Define gaps as the diferrence of sorted vector(ranks,
+#' low to high), and ranks over the maximal gap in the sorted vector set to 1,
+#' otherwise set to 0, always select the first maximal gap.
+#' If specify \code{mingap}, then ranks over the \code{mingap} set to 1, othewise
+#' set to 0. And if there has no \code{mingap} in the vector, binary index set
+#' to NA. Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
+#' \code{expr_quant_rank}. Ib is the sum of binary pattern if vector has mingap,
+#' otherwise Ib = 0.
+#'
+#' @param x Integer vector, Ranks.
+#' @param mingap Minimal gap to generate binary pattern.
+#' @return binary index with "DE"(differential exprresion) or "UC"(unclear).
+bin_index <- function(x,
+                      mingap = 3) {
+  if (!is.numeric(x)) {
+    stop("x must be numeric!")
+  }
+
+  if (length(x) <= 1) {
+    stop("x must be larger than 1!")
+  }
+
+  x_diff <- diff(sort(x))
+  if (max(x_diff) == 0) {
+    return(c(rep(1, length(x)), "HK"))
+  } else if (any(x_diff >= mingap)) {
+    max_index <- which.max(x_diff)
+    Ib <- length(x) - max_index
+    return(c(Ib, "mingap"))
+  } else {
+    return(c(NA, "UC"))
+  }
+}
+
+
+
+#' binary pattern
+#'
+#' Function to generate binary pattern(0/1) of ranked data. Define gaps as the
+#' diferrence of sorted vectors(ranks, low to high), and ranks over the
+#' maximal gap set to 1, otherwise set to 0, always select the first maximal
+#' gap.
+#' If specify \code{mingap}, then ranks over the \code{mingap} set to 1,
+#' othewise set to 0.
+#' If all values in \code{x} are identical, then all binary set to 1.
+#' If there is no \code{mingap}, all binary set to 0.
+#' Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
+#' \code{expr_quant_rank}.
+#'
+#' @param x integer vector, Ranks.
+#' @param mingap minimal gap to generate binary pattern.
+#' @return binary pattern, which can be classified into "DE"(Differential
+#' exprresion, with mingap) or "UC"(Unclear, without mingap and have different
+#' rank) or "HK"(House keeping, all in the same rank).
+bin_pattern <- function(x,
+                        mingap = 3) {
+  if (!is.numeric(x)) {
+    stop("x must be numeric!")
+  }
+
+  x_diff <- diff(sort(x))
+  if (max(x_diff) == 0) {
+    return(c(rep(1, length(x)), length(x), "HK"))
+  } else if (any(x_diff >= mingap)) {
+    max_index <- which.max(x_diff)
+    Ib <- length(x) - max_index
+    cutoff <- x_diff[max_index + 1]
+    x[x < cutoff] <- 0
+    x[x >= cutoff] <- 1
+    return(c(x, sum(x), "mingap"))
+  } else {
+    return(c(rep(NA, length(x)), 0, "UC"))
+  }
 }
 
 
@@ -173,85 +259,5 @@ expr_quant_rank <- function(df,
   return(df_rank)
 }
 
-
-
-#' binary index
-#'
-#' Function to generate binary index(the sum of \code{binary pattern}) of
-#' ranked data. Define gaps as the diferrence of sorted vector(ranks,
-#' low to high), and ranks over the maximal gap in the sorted vector set to 1,
-#' otherwise set to 0, always select the first maximal gap.
-#' If specify \code{mingap}, then ranks over the \code{mingap} set to 1, othewise
-#' set to 0. And if there has no \code{mingap} in the vector, binary index set
-#' to NA. Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
-#' \code{expr_quant_rank}. Ib is the sum of binary pattern if vector has mingap,
-#' otherwise Ib = 0.
-#'
-#' @param x Integer vector, Ranks.
-#' @param mingap Minimal gap to generate binary pattern.
-#' @return binary index with "DE"(differential exprresion) or "UC"(unclear).
-bin_index <- function(x,
-                      mingap = 3) {
-  if (!is.numeric(x)) {
-    stop("x must be numeric!")
-  }
-
-  if (length(x) <= 1) {
-    stop("x must be larger than 1!")
-  }
-
-  x_diff <- diff(sort(x))
-  if (any(x_diff >= 3)) {
-    max_index <- which(x_diff >= 3)[1]
-    Ib <- length(x) - max_index
-    #cutoff <- x[max_index + 1]
-    #x[x < cutoff] <- 0
-    #x[x >= cutoff] <- 1
-    return(c(Ib, "DE"))
-  } else {
-    return(c(NA, "UC"))
-  }
-}
-
-
-
-#' binary pattern
-#'
-#' Function to generate binary pattern(0/1) of ranked data. Define gaps as the
-#' diferrence of sorted vectors(ranks, low to high), and ranks over the
-#' maximal gap set to 1, otherwise set to 0, always select the first maximal
-#' gap.
-#' If specify \code{mingap}, then ranks over the \code{mingap} set to 1,
-#' othewise set to 0.
-#' If all values in \code{x} are identical, then all binary set to 1.
-#' If there is no \code{mingap}, all binary set to 0.
-#' Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
-#' \code{expr_quant_rank}.
-#'
-#' @param x integer vector, Ranks.
-#' @param mingap minimal gap to generate binary pattern.
-#' @return binary pattern, which can be classified into "DE"(Differential
-#' exprresion, with mingap) or "UC"(Unclear, without mingap and have different
-#' rank) or "HK"(House keeping, all in the same rank).
-bin_pattern <- function(x,
-                        mingap = 3) {
-  if (!is.numeric(x)) {
-    stop("x must be numeric!")
-  }
-
-  x_diff <- diff(sort(x))
-  if (any(x_diff >= 3)) {
-    max_index <- which(x_diff >= 3)[1]
-    Ib <- length(x) - max_index
-    cutoff <- x[max_index + 1]
-    x[x < cutoff] <- 0
-    x[x >= cutoff] <- 1
-    return(c(x, "DE"))
-  } else if (length(unique(x)) == 1) {
-    return(c(rep(1, length(x)), "HK"))
-  } else {
-    return(c(rep(0, length(x)), "UC"))
-  }
-}
 
 

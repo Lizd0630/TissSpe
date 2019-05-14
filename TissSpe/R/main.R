@@ -83,9 +83,11 @@ ts_psi <- function(df,
   ## binary type
   df_list <- list(raw = df, rank = psi_seq_rank(df = df, n = n, min = min, max = max))
 
-  ## calculate tissue specificity
-  df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
-  df_list[[2]] <- ts_ib(df_list[[2]], mingap = mingap)
+  ## calculate tissue specificity and binary index and binary pattern
+  df_list$raw <- ts_index(df_list$raw, cutoff = cutoff)
+  df_list$bin <- ts_pattern(df_list$rank, mingap = mingap)
+  df_list$rank$Ib <- df_list$bin$Ib
+  df_list$rank$Type <- df_list$bin$Type
   return(df_list)
 }
 
@@ -207,9 +209,11 @@ ts_expr <- function(df,
     stop("binary type error!")
   }
 
-  ## calculate tissue specificity
-  df_list[[1]] <- ts_index(df_list[[1]], cutoff = cutoff)
-  df_list[[2]] <- ts_ib(df_list[[2]], mingap = mingap)
+  ## calculate tissue specificity and binary index and binary pattern
+  df_list$raw <- ts_index(df_list$raw, cutoff = cutoff)
+  df_list$bin <- ts_pattern(df_list$rank, mingap = mingap)
+  df_list$rank$Ib <- df_list$bin$Ib
+  df_list$rank$Type <- df_list$bin$Type
   return(df_list)
 }
 

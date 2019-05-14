@@ -151,7 +151,7 @@ plot_heatmap <- function(lst,
                               "#FFFF00",
                               "#FF9900",
                               "#FF0000"))(100)
-  if (!is.list(lst) | !(length(names(lst)) == 2)) {
+  if (!is.list(lst) | !(length(names(lst)) == 3)) {
     stop("lst maybe fault input data!")
   }
 
