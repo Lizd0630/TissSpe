@@ -88,16 +88,17 @@ bin_pattern <- function(x,
     stop("x must be numeric!")
   }
 
-  x_diff <- diff(sort(x))
+  x_sort <- sort(x)
+  x_diff <- diff(x_sort)
   if (max(x_diff) == 0) {
     return(c(rep(1, length(x)), length(x), "HK"))
   } else if (any(x_diff >= mingap)) {
     max_index <- which.max(x_diff)
     Ib <- length(x) - max_index
-    cutoff <- x_diff[max_index + 1]
+    cutoff <- x_sort[max_index + 1]
     x[x < cutoff] <- 0
     x[x >= cutoff] <- 1
-    return(c(x, sum(x), "mingap"))
+    return(c(x, Ib, "mingap"))
   } else {
     return(c(rep(NA, length(x)), 0, "UC"))
   }
@@ -180,7 +181,7 @@ expr_seq_rank <- function(df,
   if (min < df_min | max > df_max) {
     stop(paste0("Range of expression is ", df_min, "-", df_max, "! Please check parameters!"))
   } else {
-    warning(paste0("Range of expression is ", df_min, "-", df_max, "! Be careful!"))
+    message(paste0("Range of expression you can set is ", df_min, "-", df_max, "! Be careful!"))
     bks <- seq(min, max, step)
     # bks <- quantile(min:max, probs = seq(0, 1, 1/(n-1)))
   }

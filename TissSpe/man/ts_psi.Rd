@@ -62,4 +62,9 @@ ts_psi(demo_psi,
                    "sample_M", "sample_N", "sample_O", "sample_P",
                    "sample_Q"),
                    identifier = "AS_events")
+ts_psi(demo_psi, n = 10, min = 1, cutoff = 1,
+       tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+                   "sample_E", "sample_F", "sample_G", "sample_H",
+                   "sample_I"),
+                   identifier = "AS_events")
 }
