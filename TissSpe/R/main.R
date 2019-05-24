@@ -1,4 +1,24 @@
 #########################
+###   access tissues  ###
+#########################
+#' check whether exsiting substring and return messages.
+#' @param vect vector th access.
+chk_sub <- function(vect) {
+  mes <- c()
+  for (i in 1:length(vect)) {
+    rest <- vect[-i]
+    hits <- grepl(paste0("^", vect[i]), rest)
+    if (any(hits)) {
+      mes <- c(mes, paste("tissues", vect[i], "is the substring of ",
+                          paste(rest[hits], collapse = ",")))
+    }
+  }
+  return(mes)
+}
+
+
+
+#########################
 ### For AS events psi ###
 #########################
 #' Calculate specificity of psi
@@ -60,6 +80,12 @@ ts_psi <- function(df,
                   na.del = TRUE,
                   cutoff = 0.5,
                   mingap = 3) {
+  ## check tissue names
+  mes <- chk_sub(tissues)
+  if (!is.null(mes)) {
+    stop(mes[1])
+  }
+
   ## format data.frame
   if (is.vector(tissues) & length(tissues) >= 2) {
     df <- fmt_df(df = df, tissues = tissues, identifier = identifier)
@@ -168,6 +194,12 @@ ts_expr <- function(df,
                     na.del = TRUE,
                     cutoff = 1,
                     mingap = 2) {
+  ## check tissue names
+  mes <- chk_sub(tissues)
+  if (!is.null(mes)) {
+    stop(mes[1])
+  }
+
   ## format data.frame
   if (is.vector(tissues) & length(tissues) >= 2) {
     df <- fmt_df(df = df, tissues = tissues, identifier = identifier)

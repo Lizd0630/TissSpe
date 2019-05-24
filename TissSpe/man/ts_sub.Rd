@@ -47,7 +47,7 @@ res2 <- ts_psi(demo_psi,
                    "sample_E", "sample_F", "sample_G", "sample_H",
                    "sample_I", "sample_J", "sample_K", "sample_L",
                    "sample_M", "sample_N", "sample_O", "sample_P"),
-                   identifier = "gene_id")
+                   identifier = "AS_events")
 ts_sub(res2, Ib=2, subtissues=c("sample_A", "sample_B"))
 ts_sub(res2, Ib=3, specificity = c(0.8, 1),
        subtissues = c("sample_A", "sample_B", "sample_C"))
