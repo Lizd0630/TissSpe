@@ -76,7 +76,7 @@ ts_psi <- function(df,
                   tissues,
                   identifier,
                   na.del = TRUE,
-                  mingap = 3) {
+                  mingap = 5) {
   ## check tissue names
   mes <- chk_sub(tissues)
   if (!is.null(mes)) {
@@ -280,9 +280,9 @@ ts_expr <- function(df,
 
   ## binary type
   if (binary == "fold") {
-    df_list <- list(raw = df, rank = expr_fold_rank(df = df, n = n, min = min))
+    df_list <- list(raw = df, rank = expr_fold_rank(df = df, n = n, min = cutoff))
   } else if (binary == "quant") {
-    df_list <- list(raw = df, rank = expr_quant_rank(df = df, n = n, min = min, max = max))
+    df_list <- list(raw = df, rank = expr_quant_rank(df = df, n = n, min = cutoff, max = max))
   } else if (binary == "bks") {
     df_list <- list(raw = df, rank = expr_bks_rank(df = df, bks = bks))
   } else {
