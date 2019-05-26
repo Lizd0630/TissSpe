@@ -2,9 +2,9 @@
 % Please edit documentation in R/binary_pattern.R
 \name{ts_pattern}
 \alias{ts_pattern}
-\title{Calculate binary index for a given ranks data.frame}
+\title{Calculate binary pattern for a given ranks data.frame}
 \usage{
-ts_pattern(df, mingap = 3)
+ts_pattern(df, mingap = 5)
 }
 \arguments{
 \item{df}{data.frame of ranks.}
@@ -12,9 +12,9 @@ ts_pattern(df, mingap = 3)
 \item{mingap}{integer. Minimal gap to generate binary pattern. Default 3.}
 }
 \value{
-data.frame with ranks with binary index and phenotype("DE" or "UC").
+data.frame with ranks with binary pattern and phenotype("DE" or "UC").
 }
 \description{
-Function to calculate binary index(0/1) for a given ranks data.frame and
-return a data.frame with ranks with binary index and phenotype("DE" or "UC").
+Function to calculate binary pattern(0/1) for a given ranks data.frame and
+return a data.frame with ranks with binary pattern and phenotype("DE" or "UC").
 }

@@ -24,9 +24,8 @@
 #'                    "sample_I", "sample_J", "sample_K", "sample_L",
 #'                    "sample_M", "sample_N", "sample_O", "sample_P"),
 #'                    identifier = "gene_id")
-#' ts_sub(res1, Ib=2, subtissues=c("sample_A", "sample_B"))
-#' ts_sub(res1, Ib=3, specificity = c(0, 1),
-#'        subtissues = c("sample_A", "sample_B", "sample_C"))
+#' ts_sub(res1, Ib=2, specificity = c(0, 1),
+#'        subtissues = c("sample_B", "sample_C"))
 #' res2 <- ts_psi(demo_psi,
 #'         tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
 #'                    "sample_E", "sample_F", "sample_G", "sample_H",

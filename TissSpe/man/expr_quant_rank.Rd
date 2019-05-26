@@ -12,7 +12,7 @@ expr_quant_rank(df, n = 10, min = 0, max = 12)
 \item{n}{number of medium intervals to generated (all \code{n}+2). Default
 10.}
 
-\item{min}{psi under \code{min} will be set to 0. Default 0.}
+\item{min}{expression under \code{min} will be set to 0. Default 0.}
 
 \item{max}{interval width. Default 12, 2^12 = 4096.}
 }

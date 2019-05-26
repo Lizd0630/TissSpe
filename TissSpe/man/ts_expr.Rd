@@ -4,18 +4,18 @@
 \alias{ts_expr}
 \title{Calculate specificity for gene expression}
 \usage{
-ts_expr(df, binary = "seq", n = 12, min = 0, max = 16, step = 1,
-  trans = "log2_QN", tissues, identifier, na.del = TRUE, cutoff = 1,
-  mingap = 2)
+ts_expr(df, binary = "fold", n = 12, min = 0, max = 16, bks,
+  trans = "log2", tissues, identifier, na.del = TRUE, mingap = 3)
 }
 \arguments{
 \item{df}{data.frame, which contain expression vaules. One column is the names
 of symbols, like gene_id, etc.}
 
-\item{binary}{"seq" or "quant". Binary-intervals method, "seq" refer to
-equal-width-intervals and "quant" refer to equal-density-intervals.}
+\item{binary}{"fold", "quant" or "bks". Binary-intervals method, "fold" refer to
+fold-change-intervals and "quant" refer to equal-density-intervals. "bks"
+refer to given breaks points interval.}
 
-\item{n}{Integer. \code{n+2} "seq" or "quant" intervals be generated of all
+\item{n}{Integer. \code{n+2} "fold" or "quant" intervals be generated of all
 expression values. Default 10.}
 
 \item{min}{Numeric. The values under \code{min} will be graded into rank
@@ -24,8 +24,8 @@ expression values. Default 10.}
 \item{max}{Numeric. The values over \code{max} will be graded into rank
 \code{n+1}(highest). Default 16.}
 
-\item{step}{Numeric. Width of intervals in \code{binary} "seq" method. Be
-careful when used with \code{trans}.}
+\item{bks}{Vector, numercic. Design for method \code{binary="bks"}. Ranks will
+assigned according to \code{bks}.}
 
 \item{trans}{Charactor. one of "log2", "log2_QN", "QN", "none". "QN" means
 \code{quantile.normolize}.}
@@ -39,11 +39,7 @@ for records, like "gene_id", "AS_events", etc.}
 
 \item{na.del}{Logical. Whether NAs will be dropped. Default TRUE.}
 
-\item{cutoff}{Numeric. Values under \code{cutoff} will set to 0(unexpressed)
-in Specificity method "Counts" and \code{trans="none"}, and values under
-\code{log2(cutoff+1)} will set to 0(unexpressed) in log2 transformation.}
-
-\item{mingap}{Integer. Minimal gap of generating binary pattern. Default 2.}
+\item{mingap}{Integer. Minimal gap of generating binary pattern. Default 3.}
 }
 \value{
 List of 3 data.frame. one of them contains psi values with their
@@ -53,13 +49,16 @@ index(named "rank"), the third contains binary pattern values and
 index binary "Ib"(named "bin").
 }
 \description{
-Function to find tissue-specific gene expression for a given data.frame. For
-equal-density-intervals (\code{binary = "quant"}), parameters: \code{df,
+Function to find tissue-specific gene expression for a given data.frame.
+For equal-density-intervals (\code{binary = "quant"}), parameters: \code{df,
 binary, n, min, max, tissues, identifier} must be specified, and the used
-values are in the range \code{(min, max)}. However, for
-equal-width-intervals (\code{binary = "seq"}), parameters: \code{df, binary,
-n, min, step, tissues, identifier} must be specified, and the used values
-are in the range \code{(min,  min+step*n)}.
+values are in the range \code{(min, max)}, values lower than min class as 0,
+and higher than max class as highest rank.
+However, for fold-intervals (\code{binary = "fold"}), parameters: \code{df,
+binary, n, min, tissues, identifier} must be specified, and the used values
+are in the range \code{(min, n)}.
+Finally, for given breaks (\code{binary = "bks"}), parameters: \code{df,
+binary, bks, tissues, identifier} must be specified.
 }
 \details{
 Function to detect tissue specific gene, and return a list with 2
@@ -67,14 +66,27 @@ data.frames, which contain raw values and binary pattern values and their
 specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
 "Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
 all values betwwen \code{min} and \code{max} in the data.frame will be
-graded into \code{n} equal-width-intervals or \code{n} equal-density-intervals
+graded into fold-intervals or \code{n} equal-density-intervals
 and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
 }
 \examples{
-ts_expr(demo_tpm, n = 11,
-       tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
-                   "sample_E", "sample_F", "sample_G", "sample_H",
-                   "sample_I", "sample_J", "sample_K", "sample_L",
-                   "sample_M", "sample_N", "sample_O", "sample_P"),
-                   identifier = "gene_id")
+res1 <- ts_expr(demo_tpm, binary = "fold", n = 11, min = 0.5,
+                tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+                            "sample_E", "sample_F", "sample_G", "sample_H",
+                            "sample_I", "sample_J", "sample_K", "sample_L",
+                            "sample_M", "sample_N", "sample_O", "sample_P"),
+                            identifier = "gene_id")
+res2 <- ts_expr(demo_tpm, binary = "quant", min = 0.5, max = 11,
+                tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+                            "sample_E", "sample_F", "sample_G", "sample_H",
+                            "sample_I", "sample_J", "sample_K", "sample_L",
+                            "sample_M", "sample_N", "sample_O", "sample_P"),
+                            identifier = "gene_id")
+res3 <- ts_expr(demo_tpm, binary = "bks", min = 0.5, max = 11,
+                bks = seq(0,18,1),
+                tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+                            "sample_E", "sample_F", "sample_G", "sample_H",
+                            "sample_I", "sample_J", "sample_K", "sample_L",
+                            "sample_M", "sample_N", "sample_O", "sample_P"),
+                            identifier = "gene_id")
 }

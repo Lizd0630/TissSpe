@@ -4,13 +4,13 @@
 \alias{psi_seq_rank}
 \title{Ranking psi according to equal-width-intervals}
 \usage{
-psi_seq_rank(df, n = 10, min = 0, max = 100)
+psi_seq_rank(df, n = 20, min = 0, max = 100)
 }
 \arguments{
 \item{df}{data.frame.}
 
 \item{n}{number of medium intervals to generated (all \code{n}+2). Default
-10.}
+20.}
 
 \item{min}{psi under \code{min} will be set to 0.}
 

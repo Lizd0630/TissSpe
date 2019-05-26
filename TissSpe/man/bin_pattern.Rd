@@ -4,7 +4,7 @@
 \alias{bin_pattern}
 \title{binary pattern}
 \usage{
-bin_pattern(x, mingap = 3)
+bin_pattern(x, mingap = 5)
 }
 \arguments{
 \item{x}{integer vector, Ranks.}
@@ -21,10 +21,11 @@ Function to generate binary pattern(0/1) of ranked data. Define gaps as the
 diferrence of sorted vectors(ranks, low to high), and ranks over the
 maximal gap set to 1, otherwise set to 0, always select the first maximal
 gap.
-If specify \code{mingap}, then ranks over the \code{mingap} set to 1,
-othewise set to 0.
-If all values in \code{x} are identical, then all binary set to 1.
-If there is no \code{mingap}, all binary set to 0.
-Ranks value from function:\code{psi_seq_rank}, \code{expr_seq_rank},
-\code{expr_quant_rank}.
+If specify \code{mingap}, then ranks over the maximal gap set to 1,
+othewise set to 0. And assign it as "DE", differential expression.
+If all values in \code{x} are identical, then all binary set to 1. And assign
+it as "HK", house-keeping.
+If there is no \code{mingap}, all binary set to 0. And assign it as "UC", unclear.
+Ranks value from function:\code{psi_seq_rank}, \code{expr_fold_rank},
+\code{expr_quant_rank}, \code{expr_bks_rank}.
 }

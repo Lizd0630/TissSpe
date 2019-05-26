@@ -4,8 +4,8 @@
 \alias{ts_psi}
 \title{Calculate specificity of psi}
 \usage{
-ts_psi(df, n = 10, min = 0, max = 100, tissues, identifier,
-  na.del = TRUE, cutoff = 0.5, mingap = 3)
+ts_psi(df, n = 20, min = 0, max = 100, tissues, identifier,
+  na.del = TRUE, mingap = 3)
 }
 \arguments{
 \item{df}{data.frame, which contain psi vaules (0-100). One column is the names of
@@ -30,11 +30,8 @@ for row symbols, like "gene_id", "AS_events", etc.}
 
 \item{na.del}{Logical. Whether NAs will be dropped. Default TRUE.}
 
-\item{cutoff}{Numeric. Values under \code{cutoff} will set to 0(unexpressed)
-in Specificity method "Counts".}
-
 \item{mingap}{Integer. Minimal gap of generating binary pattern, Please
-refer the paper. Default 3.}
+refer the paper. Default 5.}
 }
 \value{
 List of 3 data.frame. one of them contains psi values with their
@@ -47,7 +44,7 @@ index binary "Ib"(named "bin").
 Function to find tissue-specific AS-events for a given data.frame.
 }
 \details{
-Function to detect tissue-specific AS events, and return a list with 2
+Function to detect tissue-specific AS events, and return a list with 3
 data.frames, which contain psi values and binary pattern values and their
 specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
 "Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
@@ -55,16 +52,16 @@ all values betwwen min and max in the data.frame will be graded into n
 equal-width-intervals and then assign the rank 0(unexpressed) to \code{n+1}.
 }
 \examples{
-ts_psi(demo_psi,
-       tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
-                   "sample_E", "sample_F", "sample_G", "sample_H",
-                   "sample_I", "sample_J", "sample_K", "sample_L",
-                   "sample_M", "sample_N", "sample_O", "sample_P",
-                   "sample_Q"),
-                   identifier = "AS_events")
-ts_psi(demo_psi, n = 10, min = 1, cutoff = 1,
-       tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
-                   "sample_E", "sample_F", "sample_G", "sample_H",
-                   "sample_I"),
-                   identifier = "AS_events")
+res1 <- ts_psi(demo_psi, n = 20, min = 0.5,
+               tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+                           "sample_E", "sample_F", "sample_G", "sample_H",
+                           "sample_I", "sample_J", "sample_K", "sample_L",
+                           "sample_M", "sample_N", "sample_O", "sample_P",
+                           "sample_Q"),
+                           identifier = "AS_events")
+res2 <- ts_psi(demo_psi, n = 10, min = 1,
+               tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
+                           "sample_E", "sample_F", "sample_G", "sample_H",
+                           "sample_I"),
+                           identifier = "AS_events")
 }
