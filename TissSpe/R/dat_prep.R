@@ -16,7 +16,7 @@ expr_mean <- function(x) {
 
 
 
-#' maximal value of replicates
+#' maximal value of vector
 #'
 #' Function require a vector with numeric in different conditions.
 #' Max is calculated taking in account tissues with 0 expression: 2+0+4=4.
@@ -25,6 +25,23 @@ expr_mean <- function(x) {
 expr_max <- function(x) {
   if(!all(is.na(x))) {
     res <- max(x, na.rm = T)
+  } else {
+    res <- NA
+  }
+  return(res)
+}
+
+
+
+#' max difference of vector
+#'
+#' Function require a vector with numeric in different conditions.
+#' Max is calculated taking in account tissues with 0 expression: 2+0+4=4.
+#'
+#' @param x numeric.
+expr_diff <- function(x) {
+  if(!all(is.na(x))) {
+    res <- max(x, na.rm = T) - min(x, na.rm = T)
   } else {
     res <- NA
   }
@@ -79,6 +96,43 @@ rep_mean <- function(df,
                          dims = 1)
   }
   df <- as.data.frame(mat)
+  return(df)
+}
+
+
+
+#' diff expression of replicates
+#'
+#' Function requires data frame with numeric. Difference between
+#' replicates are calculated. \code{tissues} must be the unique word-start
+#' identifier to recognize sample replicates. \code{identifier} is the colname
+#' of gene names or AS events.
+#'
+#' @param df data.frame.
+#' @param tissues charactors. Unique word-start identifiers to recognize
+#' sample replicates.
+#' @importFrom stats sd
+#
+rep_diff <- function(df,
+                     tissues) {
+  mat <- matrix(NA, ncol = length(tissues), nrow = nrow(df))
+  len <- 1:length(tissues)
+  colnames(mat) <- tissues
+  rownames(mat) <- rownames(df)
+  for (i in tissues) {
+    tissue <- (regexpr(paste0("^", i), colnames(df)) > 0)
+    if (!any(tissue)) {
+      stop(paste0("'", i, "'", " may not in your data! Please check!"))
+    } else if (sum(tissue) == 1) {
+      mat[, i] <- 0
+    } else {
+      mat[, i] <- apply(apply(df[, tissue], 1, function(x) {range(x, na.rm = T)}), 2, diff)
+    }
+  }
+  df <- as.data.frame(mat)
+  df$Mean_diff <- apply(df[, len], 1, mean)
+  df$Max_diff <- apply(df[, len], 1, max)
+  df$diff_sd <- apply(df[, len], 1, sd)
   return(df)
 }
 

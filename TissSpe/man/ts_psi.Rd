@@ -5,7 +5,7 @@
 \title{Calculate specificity of psi}
 \usage{
 ts_psi(df, n = 20, min = 0, max = 100, tissues, identifier,
-  na.del = TRUE, mingap = 3)
+  na.del = TRUE, mingap = 5)
 }
 \arguments{
 \item{df}{data.frame, which contain psi vaules (0-100). One column is the names of
@@ -34,22 +34,36 @@ for row symbols, like "gene_id", "AS_events", etc.}
 refer the paper. Default 5.}
 }
 \value{
-List of 3 data.frame. one of them contains psi values with their
-specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
-index(named "rank"), the third contains binary pattern values and
-index binary "Ib"(named "bin").
+list with 5 data.frames.
+1) "raw" contain mean values of replicates (PSI and their specificty values
+of 9 methods ("Tau", "Gini", "Tsi", "Counts", "Ee", "Pem", "Hg", "Z", "Spm"),
+and Means of expression, Max values of expression, Ranges of expression,
+and sd of expression.
+2) "rank" contain rank pattern values, Binary Index, and type defined with
+mingap.
+3) "bin" contain binary pattern values, Binary Index, and type defined with
+mingap.
+4) "diff" contain maximal difference of replicates for each cell type, maximal
+difference of all cell type, and sd of all difference.
+5) "origin" contain raw data with replicates before any manipulation.
 }
 \description{
 Function to find tissue-specific AS-events for a given data.frame.
 }
 \details{
-Function to detect tissue-specific AS events, and return a list with 3
-data.frames, which contain psi values and binary pattern values and their
-specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
-all values betwwen min and max in the data.frame will be graded into n
-equal-width-intervals and then assign the rank 0(unexpressed) to \code{n+1}.
+Function to detect tissue specific gene, and return a list with 5
+data.frames.
+1) "raw" contain mean values of replicates (PSI and their specificty values
+of 9 methods ("Tau", "Gini", "Tsi", "Counts", "Ee", "Pem", "Hg", "Z", "Spm"),
+and Means of expression, Max values of expression, Ranges of expression,
+and sd of expression.
+2) "rank" contain rank pattern values, Binary Index, and type defined with
+mingap.
+3) "bin" contain binary pattern values, Binary Index, and type defined with
+mingap.
+4) "diff" contain maximal difference of replicates for each cell type, maximal
+difference of all cell type, and sd of all difference.
+5) "origin" contain raw data with replicates before any manipulation.
 }
 \examples{
 res1 <- ts_psi(demo_psi, n = 20, min = 0.5,

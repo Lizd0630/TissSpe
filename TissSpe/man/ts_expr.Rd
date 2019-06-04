@@ -42,11 +42,18 @@ for records, like "gene_id", "AS_events", etc.}
 \item{mingap}{Integer. Minimal gap of generating binary pattern. Default 3.}
 }
 \value{
-List of 3 data.frame. one of them contains psi values with their
-specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
-index(named "rank"), the third contains binary pattern values and
-index binary "Ib"(named "bin").
+list with 5 data.frames.
+1) "raw" contain mean values of replicates (TPM/RPKM/FPKM or their transformed
+values: log2, QN, ...), their specificty values of 9 methods ("Tau", "Gini",
+"Tsi", "Counts", "Ee", "Pem", "Hg", "Z", "Spm"), and Means of expression,
+Max values of expression, Ranges of expression, and sd of expression.
+2) "rank" contain rank pattern values, Binary Index, and type defined with
+mingap.
+3) "bin" contain binary pattern values, Binary Index, and type defined with
+mingap.
+4) "diff" contain maximal difference of replicates for each cell type, maximal
+difference of all cell type, and sd of all difference.
+5) "origin" contain raw data with replicates before any manipulation.
 }
 \description{
 Function to find tissue-specific gene expression for a given data.frame.
@@ -61,13 +68,19 @@ Finally, for given breaks (\code{binary = "bks"}), parameters: \code{df,
 binary, bks, tissues, identifier} must be specified.
 }
 \details{
-Function to detect tissue specific gene, and return a list with 2
-data.frames, which contain raw values and binary pattern values and their
-specificty values of 10 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm", "Ib". Rows with NA will be dropped. Of the binary pattern,
-all values betwwen \code{min} and \code{max} in the data.frame will be
-graded into fold-intervals or \code{n} equal-density-intervals
-and then assign the rank 0(unexpressed) to \code{n+1}(highest), respectively.
+Function to detect tissue specific gene, and return a list with 5
+data.frames.
+1) "raw" contain mean values of replicates (TPM/RPKM/FPKM or their transformed
+values: log2, QN, ...), their specificty values of 9 methods ("Tau", "Gini",
+"Tsi", "Counts", "Ee", "Pem", "Hg", "Z", "Spm"), and Means of expression,
+Max values of expression, Ranges of expression, and sd of expression.
+2) "rank" contain rank pattern values, Binary Index, and type defined with
+mingap.
+3) "bin" contain binary pattern values, Binary Index, and type defined with
+mingap.
+4) "diff" contain maximal difference of replicates for each cell type, maximal
+difference of all cell type, and sd of all difference.
+5) "origin" contain raw data with replicates before any manipulation.
 }
 \examples{
 res1 <- ts_expr(demo_tpm, binary = "fold", n = 11, min = 0.5,

@@ -9,6 +9,7 @@
 #' @param df data.frame of numeric.
 #' @param cutoff Numeric. Values under cutoff will set to 0(unexpressed) in
 #' Specificity method Counts.
+#' @importFrom stats sd
 #' @return data.frame with original value with specificity index of 9 methhods.
 ts_index <- function(df,
                      cutoff = 1) {
@@ -25,6 +26,8 @@ ts_index <- function(df,
 
   df$Mean <- apply(df[, len], 1, expr_mean)
   df$Max <- apply(df[, len], 1, expr_max)
+  df$sd <- apply(df[, len], 1, sd)
+  df$Max_diff <- apply(df[, len], 1, expr_diff)
   return(df)
 }
 

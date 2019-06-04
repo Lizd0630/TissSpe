@@ -1,7 +1,7 @@
 Package: TissSpe
 Type: Package
 Title: Caculate tissue-specific index
-Version: 1.1.0
+Version: 1.2.1
 Authors@R: c(person(given = "Zhidan", family = "Li", email = "lzd_hunan@126.com", role = c("aut", "cre")), person(given = "Li", family = "Chen", email = "875917111@qq.com", role = c("ctb")))
 Maintainer: Zhidan Li <lzd_hunan@126.com>
 Description: This package implements methods to caculate tissue-specific index
@@ -14,7 +14,9 @@ Imports:
     DescTools,
     preprocessCore,
     gplots,
-    pheatmap
+    pheatmap,
+    grid,
+    ggplotify
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

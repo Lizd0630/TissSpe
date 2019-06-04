@@ -1,3 +1,56 @@
+#' multi-plot
+#'
+#' code from internet
+#'
+#' @param ... plots
+#' @param plotlist plotlist
+#' @param cols ncol
+#' @param layout layout of plots.
+#' @importFrom grid grid.newpage
+#' @importFrom grid pushViewport
+#' @importFrom grid viewport
+#' @importFrom grid grid.layout
+multiplot <- function(...,
+                      plotlist = NULL,
+                      cols = 1,
+                      layout = NULL) {
+  #library(grid)
+
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+
+  numPlots = length(plots)
+
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+
+  if (numPlots==1) {
+    print(plots[[1]])
+
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
+
+
 ###########################
 # specificty distribution #
 ###########################
@@ -91,21 +144,16 @@ plot_density <- function(lst,
 
 
 
-###########################
-#         heatpam         #
-###########################
+################################################
+###########         heatmap         ############
+################################################
 #' Heatmap for subset specific-expression
 #'
 #' Wrapper function derived from \code{pheatmap}. Use the results of
 #' \code{ts_expr} or \code{ts_psi} as Input. Using pheatmap youself may be
 #' better for yourwork sometimes.
 #'
-#' @param lst List of 3 data.frame. one of them contains psi values with their
-#' specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-#' "Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
-#' index(named "rank"), the third contains binary pattern values and
-#' index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
-#' \code{ts_expr}.
+#' @param lst List of 5 data.frame. Generated from \code{ts_psi} or \code{ts_expr}.
 #' @param dat_type "raw", "rank" or c('raw', 'rank'). Plot "raw"(psi/FPKM/RPKM/TPM) or
 #' "rank"(0-n+1). Default "raw". "raw" work with \code{specificity}, and
 #' "rank" work with \code{Ib}. If specify c('raw', 'rank'), then plot the heatmap of
@@ -151,8 +199,8 @@ plot_heatmap <- function(lst,
                               "#FFFF00",
                               "#FF9900",
                               "#FF0000"))(100)
-  if (!is.list(lst) | !(length(names(lst)) == 3)) {
-    stop("lst maybe fault input data!")
+  if (!is.list(lst) | !(length(lst) == 5)) {
+    stop("lst maybe wrong input data!")
   }
 
   if (length(dat_type) == 1) {
@@ -228,3 +276,107 @@ plot_heatmap <- function(lst,
   }
 }
 
+
+
+################################################
+###########         heatmap         ############
+################################################
+#' Heatmap for compare rank between origin value (mean and replicates)
+#'
+#' Wrapper function derived from \code{pheatmap}. Use the results of
+#' \code{ts_sub} as Input.
+#'
+#' @param lst List of 5 data.frame. Generated from \code{ts_psi} or \code{ts_expr}.
+#' @param sort_fun Heatmap row order. "in" (increase) or "de" (decrease).
+#' @param trans Transformation of origion data for heatmap. "none" or "log2".
+#' @param main1 Title of rank plot.
+#' @param main2 Title of values (for calculate specificty) with replicates. For
+#' expression, log2(CPM/FPKM/RPKM/TPM+1).
+#' @param main3 Title of origin values with Z-score.
+#' @param cluster_cols refer to the same parameter in \code{pheatmap}.
+#' @param cluster_rows refer to the same parameter in \code{pheatmap}.
+#' @param show_rownames refer to the same parameter in \code{pheatmap}.
+#' @param ... parameters of \code{pheatmap} pkg.
+#' @importFrom pheatmap pheatmap
+#' @importFrom grDevices colorRampPalette
+#' @importFrom grDevices palette
+#' @importFrom ggplotify as.ggplot
+#' @export
+#' @examples
+#' res <- ts_psi(demo_psi,
+#'               tissues = c("sample_A", "sample_B", "sample_C",
+#'                           "sample_D", "sample_E", "sample_F",
+#'                           "sample_G", "sample_H", "sample_I",
+#'                           "sample_J", "sample_K", "sample_L",
+#'                           "sample_M", "sample_N", "sample_O",
+#'                           "sample_P", "sample_Q"),
+#'                           identifier = "AS_events")
+#' sub_1 <- ts_sub(res, Ib = 1)
+#' cmp_heatmap(sub_1,
+#'             sort_fun = "de",
+#'             main1 = "PSI rank",
+#'             main2 = "PSI mean",
+#'             main3 = "PSI (Z-score)")
+cmp_heatmap <- function(lst,
+                        sort_fun = "de",
+                        trans = "none",
+                        main1 = "rank",
+                        main2 = "origin value",
+                        main3 = "origin value (Z-score)",
+                        cluster_cols = FALSE,
+                        cluster_rows = FALSE,
+                        show_rownames = FALSE,
+                        ...) {
+  color <- colorRampPalette(c("#000099",
+                              "#3399FF",
+                              "#3399CC",
+                              "#FFFF00",
+                              "#FF9900",
+                              "#FF0000"))(100)
+  if (!is.list(lst) | !(length(lst) == 5)) {
+    stop("lst maybe wrong input data!")
+  }
+
+  if (!is.character(trans)) {
+    stop("trans should be character!")
+  }
+
+  if (!is.character(sort_fun)) {
+    stop("sort_fun should be character!")
+  }
+
+  if (!is.character(main1)) {
+    stop("main1 should be character!")
+  }
+
+  if (!is.character(main2)) {
+    stop("mian2 should be character!")
+  }
+
+  if (!is.character(main3)) {
+    stop("main3 should be character!")
+  }
+
+  num <- which(colnames(lst$rank) == "Ib") - 1
+
+  if (sort_fun == "de") {
+    names <- rownames(sort_dat_de(lst$rank[, 1:num]))
+  } else if (sort_fun == "in") {
+    names <- rownames(sort_dat_in(lst$rank[, 1:num]))
+  } else {
+    stop("sort_fun error!")
+  }
+
+  p1 <- pheatmap(lst$rank[names, 1:num], cluster_cols=F, cluster_rows=F, show_rownames = F, color = color, silent = T, main = main1)
+  if (trans == "none") {
+    p2 <- pheatmap(lst$origin[names, ], cluster_cols=F, cluster_rows=F, show_rownames = F, color = color, silent = T, main = main2)
+  } else if (trans == "log2") {
+    p2 <- pheatmap(log2(lst$origin[names, ] + 1), cluster_cols=F, cluster_rows=F, show_rownames = F, color = color, silent = T, main = main2)
+  } else {
+    stop("trans value error!")
+  }
+
+  p3 <- pheatmap(lst$origin[names, ], scale = "row", cluster_cols=F, cluster_rows=F, show_rownames = F, color = color, silent = T, main = main3)
+
+  multiplot(as.ggplot(p1), as.ggplot(p2), as.ggplot(p3), cols = 3)
+}

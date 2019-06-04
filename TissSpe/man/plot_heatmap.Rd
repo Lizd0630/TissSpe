@@ -9,12 +9,7 @@ plot_heatmap(lst, dat_type = "raw", specificity = c(0.8, 1),
   cluster_rows = FALSE, show_rownames = FALSE, ...)
 }
 \arguments{
-\item{lst}{List of 3 data.frame. one of them contains psi values with their
-specificty values of 9 methods: "Tau", "Gini", "Tsi", "Counts", "Ee", "Pem",
-"Hg", "Z", "Spm"(named "raw"), the second contains rank values and binary
-index(named "rank"), the third contains binary pattern values and
-index binary "Ib"(named "bin"), which were generated from \code{ts_psi} or
-\code{ts_expr}.}
+\item{lst}{List of 5 data.frame. Generated from \code{ts_psi} or \code{ts_expr}.}
 
 \item{dat_type}{"raw", "rank" or c('raw', 'rank'). Plot "raw"(psi/FPKM/RPKM/TPM) or
 "rank"(0-n+1). Default "raw". "raw" work with \code{specificity}, and

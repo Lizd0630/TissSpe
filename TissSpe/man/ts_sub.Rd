@@ -5,7 +5,9 @@
 \title{tissue-specific gene subset}
 \usage{
 ts_sub(lst, Ib = 1, specificity = c(0, 1), ts_method = "Tau",
-  subtissues)
+  subtissues = NULL, sample_mean = c(-Inf, Inf),
+  sample_mean_sd = Inf, sample_max = c(-Inf, Inf), sample_range = 0,
+  rep_diff_max = Inf, rep_diff_sd = Inf, rep_diff_mean = Inf)
 }
 \arguments{
 \item{lst}{List of 3 data.frame. one of them contains raw values(or psi values
@@ -22,11 +24,26 @@ index(named "rank"), the third contains binary pattern values and index binary "
 \item{ts_method}{Specificity methods. "Tau", "Gini", "TSI", "Counts", "EE",
 "Hg", "Zscore", "Spm" or "Pem".}
 
-\item{subtissues}{Charactor, vector. Of binary pattern, only tissues in
-\code{subtissues} have value 1, that is specific-overexpression.}
+\item{subtissues}{Character or NULL. Of binary pattern, character: only tissues in
+\code{subtissues} have value 1, that is specific-overexpression. NULL: all the
+Ib will be included.}
+
+\item{sample_mean}{c(-Inf, Inf)}
+
+\item{sample_mean_sd}{Inf}
+
+\item{sample_max}{c(-Inf, Inf)}
+
+\item{sample_range}{0}
+
+\item{rep_diff_max}{Inf}
+
+\item{rep_diff_sd}{Inf}
+
+\item{rep_diff_mean}{Inf}
 }
 \value{
-a list with 3 data.frames. Subset of \code{lst}.
+a list with 5 data.frames. Subset of \code{lst}.
 }
 \description{
 Function to get a gene subset accroding to specified \code{Ib} and
@@ -39,15 +56,17 @@ res1 <- ts_expr(demo_tpm, n = 11,
                    "sample_I", "sample_J", "sample_K", "sample_L",
                    "sample_M", "sample_N", "sample_O", "sample_P"),
                    identifier = "gene_id")
-ts_sub(res1, Ib=2, specificity = c(0, 1),
+ts_sub(res1, Ib = 2, specificity = c(0, 1),
        subtissues = c("sample_B", "sample_C"))
+ts_sub(res1, Ib = 3)
 res2 <- ts_psi(demo_psi,
         tissues = c("sample_A", "sample_B", "sample_C", "sample_D",
                    "sample_E", "sample_F", "sample_G", "sample_H",
                    "sample_I", "sample_J", "sample_K", "sample_L",
                    "sample_M", "sample_N", "sample_O", "sample_P"),
                    identifier = "AS_events")
-ts_sub(res2, Ib=2, subtissues=c("sample_A", "sample_B"))
-ts_sub(res2, Ib=3, specificity = c(0.8, 1),
+ts_sub(res2, Ib = 2, subtissues=c("sample_A", "sample_B"))
+ts_sub(res2, Ib = 3, specificity = c(0.8, 1),
        subtissues = c("sample_A", "sample_B", "sample_C"))
+ts_sub(res2, Ib = 15)
 }
