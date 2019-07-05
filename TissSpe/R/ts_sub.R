@@ -85,7 +85,7 @@ ts_sub <- function(lst,
   df3 <- lst$bin
   df4 <- lst$diff
   df5 <- lst$origin
-  num <- which(colnames(df1) == "Tau")
+  num <- which(colnames(df1) == "Tau") - 1
   tissues <- colnames(df1)[1:num]
   #diff_tissue <- setdiff(tissues, subtissues)
 
@@ -186,16 +186,18 @@ ts_sub <- function(lst,
                     diff = df4[int_genes,],
                     origin = df5[int_genes,]
     )
-    if (is.null(subtissues)) {
-      new_lst$bin$Type <- paste0(subtissues, collapse = ",")
-      new_lst$rank$Type <- paste0(subtissues, collapse = ",")
-    } else {
+    # if (is.null(subtissues)) {
+    #   new_lst$bin$Type <- paste0(subtissues, collapse = ",")
+    #   new_lst$rank$Type <- paste0(subtissues, collapse = ",")
+    # } else {
       type <- apply(new_lst$bin[, 1:num], 1, function(x) {
         return(paste0(tissues[which(x == 1)], collapse = ","))
         })
       new_lst$bin$Type <- type
       new_lst$rank$Type <- type
-    }
+    # }
+    new.order <- order(-new_lst$raw$Tau, -new_lst$raw$Max_diff)
+    new_lst <- lapply(new_lst, function(x) {return(x[new.order,])})
   }
   return(new_lst)
 }
