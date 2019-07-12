@@ -240,7 +240,7 @@ expr_quant_rank <- function(df,
   df_max <- max(vect, na.rm = TRUE)
 
   if (min < df_min | max > df_max) {
-    stop(paste0("Please set min and max psi to 0-", df_max, "!"))
+    stop(paste0("Please set min and max to 0-", df_max, "!"))
   } else {
     vect <- vect[(vect >= min & vect <= max)]
     bks <- as.vector(quantile(vect, probs = seq(0, 1, 1/n)))
